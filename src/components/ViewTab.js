@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Tabs, Icon } from 'antd'
 import PriceList from './PriceList'
+import TimePicker from '../containers/TimePicker/TimePicker'
 
 const list = [
   {
@@ -36,6 +37,13 @@ function callback(key) {
 }
 
 export default class ViewTabs extends Component {
+  constructor() {
+    super()
+    this.state = {
+      year: 2019,
+      month: 9
+    }
+  }
   render() {
     return (
       <Tabs defaultActiveKey="1" onChange={callback}>
@@ -48,6 +56,7 @@ export default class ViewTabs extends Component {
           key="1"
         >
           <PriceList list={list}></PriceList>
+          <TimePicker year={this.state.year} month={this.state.month} />
         </TabPane>
         <TabPane
           tab={

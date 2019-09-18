@@ -25,6 +25,10 @@ const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpack
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter')
 const eslint = require('eslint')
 
+function pathResolve(dir) {
+  return path.join(__dirname, '..', dir)
+}
+
 const postcssNormalize = require('postcss-normalize')
 
 const appPackageJson = require(paths.appPackageJson)
@@ -289,7 +293,15 @@ module.exports = function(webpackEnv) {
       alias: {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-        'react-native': 'react-native-web'
+        'react-native': 'react-native-web',
+        '@/api': pathResolve('src/api'),
+        '@/assets': pathResolve('src/assets'),
+        '@/components': pathResolve('src/components'),
+        '@/layouts': pathResolve('src/layouts'),
+        '@/pages': pathResolve('src/pages'),
+        '@/redux': pathResolve('src/redux'),
+        '@/router': pathResolve('src/router'),
+        '@/utils': pathResolve('src/utils')
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding

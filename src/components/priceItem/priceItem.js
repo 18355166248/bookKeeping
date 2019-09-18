@@ -1,16 +1,11 @@
 import React, { Component } from 'react'
 import { Button, Icon } from 'antd'
+import PriceItemScss from './priceItem.module.scss'
 
 export default class PriceItem extends Component {
   render() {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '20px 40px'
-        }}
-      >
+      <div className={PriceItemScss['price_item']}>
         <Icon type={this.props.category.iconName} />
         <span>{this.props.title}</span>
         <span>

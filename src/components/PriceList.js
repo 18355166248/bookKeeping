@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import PriceItem from './priceItem'
+import PriceItem from './priceItem/priceItem'
 
 class PriceList extends Component {
   render() {

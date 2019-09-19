@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Tabs, Icon } from 'antd'
 import PriceList from './PriceList'
-import TimePicker from '../containers/TimePicker/TimePicker'
 
 const list = [
   {
@@ -13,7 +12,7 @@ const list = [
       id: 1,
       name: '电子',
       type: 'outcome',
-      iconName: 'bar-chart'
+      iconName: 'money-collect'
     }
   },
   {
@@ -25,7 +24,31 @@ const list = [
       id: 1,
       name: '电子',
       type: 'outcome',
-      iconName: 'mobile'
+      iconName: 'money-collect'
+    }
+  },
+  {
+    id: 3,
+    title: '去日月光打车',
+    price: 50,
+    date: '2019-08-27',
+    category: {
+      id: 1,
+      name: '出行',
+      type: 'outcome',
+      iconName: 'car'
+    }
+  },
+  {
+    id: 4,
+    title: '8月份工资',
+    price: 13578,
+    date: '2019-09-15',
+    category: {
+      id: 1,
+      name: '收入',
+      type: 'income',
+      iconName: 'wallet'
     }
   }
 ]
@@ -37,13 +60,6 @@ function callback(key) {
 }
 
 export default class ViewTabs extends Component {
-  constructor() {
-    super()
-    this.state = {
-      year: 2019,
-      month: 9
-    }
-  }
   render() {
     return (
       <Tabs defaultActiveKey="1" onChange={callback}>
@@ -56,7 +72,6 @@ export default class ViewTabs extends Component {
           key="1"
         >
           <PriceList list={list}></PriceList>
-          <TimePicker year={this.state.year} month={this.state.month} />
         </TabPane>
         <TabPane
           tab={

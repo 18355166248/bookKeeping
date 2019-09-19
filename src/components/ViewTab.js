@@ -40,10 +40,18 @@ export default class ViewTabs extends Component {
   constructor() {
     super()
     this.state = {
-      year: 2019,
-      month: 9
+      year: '',
+      month: ''
     }
   }
+
+  changeTime = ({ year, month }) => {
+    this.setState({
+      year,
+      month
+    })
+  }
+
   render() {
     return (
       <Tabs defaultActiveKey="1" onChange={callback}>
@@ -56,7 +64,12 @@ export default class ViewTabs extends Component {
           key="1"
         >
           <PriceList list={list}></PriceList>
-          <TimePicker year={this.state.year} month={this.state.month} />
+          <TimePicker
+            year={this.state.year}
+            month={this.state.month}
+            onChange={this.changeTime}
+            clearable
+          />
         </TabPane>
         <TabPane
           tab={

@@ -1,26 +1,39 @@
 import React, { Component } from 'react'
-import { Menu, Dropdown, Icon, Button } from 'antd'
+import { Menu, Dropdown, Icon, Button, Input } from 'antd'
 import TimePickerClass from './TimePicker.module.scss'
 import './TimePicker.scss'
 import { range } from 'utils/util'
 
 export default class TimePicker extends Component {
-  constructor(props) {
-    super(props)
-    const { year, month } = props
-    this.state = {
-      year,
-      month
-    }
-  }
   selectTime = (type, value) => {
+    const { year, month } = this.props
     this.setState({
       [type]: value
     })
+    let obj = {}
+    if (type === 'year') {
+      obj = {
+        year: value,
+        month: month || new Date().getMonth() + 1
+      }
+    } else if (type === 'month') {
+      obj = {
+        year: year || new Date().getFullYear(),
+        month: value
+      }
+    }
+    this.props.onChange(obj)
+  }
+
+  clear = () => {
+    this.props.onChange({ year: '', month: '' })
   }
 
   render() {
-    const yearList = range(9, -4).map(v => this.props.year + v)
+    const { year, month } = this.props
+    let startYear = this.props.startYear
+    if (!startYear) startYear = new Date().getFullYear()
+    const yearList = range(9, -4).map(v => Number(startYear) + v)
     const monthList = range(12, 1)
 
     const menu = (
@@ -32,7 +45,7 @@ export default class TimePicker extends Component {
                 <div
                   onClick={() => this.selectTime('year', v)}
                   key={v}
-                  className={`${v === this.state.year ? TimePickerClass.active : ''} ${
+                  className={`${v === year ? TimePickerClass.active : ''} ${
                     TimePickerClass['common_cell']
                   }`}
                 >
@@ -45,7 +58,7 @@ export default class TimePicker extends Component {
                 <div
                   onClick={() => this.selectTime('month', v)}
                   key={v}
-                  className={`${v === this.state.month ? TimePickerClass.active : ''} ${
+                  className={`${v === month ? TimePickerClass.active : ''} ${
                     TimePickerClass['common_cell']
                   }`}
                 >
@@ -60,14 +73,35 @@ export default class TimePicker extends Component {
 
     return (
       <Dropdown overlay={menu} trigger={['click']}>
-        <Button className={TimePickerClass.btn}>
-          {this.props.year && this.props.month ? (
-            <span className="ac po100">{`${this.state.year} 年 ${this.state.month} 月`}</span>
-          ) : (
-            ''
-          )}
-          <Icon type="down" className={TimePickerClass.rightArrow} />
-        </Button>
+        <Input
+          readOnly
+          value={
+            this.props.year && this.props.month ? `${year} 年 ${month} 月` : ''
+          }
+          className={`${TimePickerClass.btn} ${
+            this.props.clearable && this.props.year && this.props.month
+              ? TimePickerClass['clearable_show_btn']
+              : ''
+          }`}
+          suffix={
+            this.props.clearable ? (
+              <span>
+                <Icon
+                  type="close-circle"
+                  theme="filled"
+                  onClick={this.clear}
+                  className={TimePickerClass['clear_icon']}
+                />
+                <Icon
+                  type="calendar"
+                  className={TimePickerClass['calendar_icon']}
+                />
+              </span>
+            ) : (
+              <Icon type="calendar" />
+            )
+          }
+        />
       </Dropdown>
     )
   }

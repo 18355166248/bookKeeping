@@ -1,8 +1,4 @@
-import React, { Component } from 'react'
-import { Tabs, Icon } from 'antd'
-import PriceList from './PriceList'
-
-const list = [
+export const constList = [
   {
     id: 1,
     title: '买了airPods',
@@ -52,38 +48,3 @@ const list = [
     }
   }
 ]
-
-const { TabPane } = Tabs
-
-function callback(key) {
-  console.log(key)
-}
-
-export default class ViewTabs extends Component {
-  render() {
-    return (
-      <Tabs defaultActiveKey="1" onChange={callback}>
-        <TabPane
-          tab={
-            <span>
-              <Icon type="car" /> Tab 1
-            </span>
-          }
-          key="1"
-        >
-          <PriceList list={list}></PriceList>
-        </TabPane>
-        <TabPane
-          tab={
-            <span>
-              <Icon type="crown" /> Tab 2
-            </span>
-          }
-          key="2"
-        >
-          Content of Tab Pane 2
-        </TabPane>
-      </Tabs>
-    )
-  }
-}

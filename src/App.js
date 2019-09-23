@@ -1,17 +1,18 @@
-import React from 'react'
-import './App.css'
-import ViewTab from './components/ViewTab'
-import TimePicker from 'containers/TimePicker/TimePicker'
+import React, { Component } from 'react'
+import ViewTab from 'components/ViewTab/ViewTab'
+import HeaderPrice from 'components/HeaderPrice/HeaderPrice'
+import { constList } from '@/mock'
+import './App.scss'
 
-function App() {
-  const year = 2019
-  const month = 9
-  return (
-    <div className="App">
-      <TimePicker year={year} month={month} />
-      <ViewTab></ViewTab>
-    </div>
-  )
+class App extends Component {
+  render() {
+    return (
+      <div className="App">
+        <HeaderPrice></HeaderPrice>
+        <ViewTab list={constList}></ViewTab>
+      </div>
+    )
+  }
 }
 
 export default App

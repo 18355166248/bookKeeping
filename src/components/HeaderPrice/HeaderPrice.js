@@ -4,18 +4,8 @@ import TotalPrice from 'components/TotalPrice/TotalPrice'
 import HeaderPriceCss from './HeaderPrice.module.scss'
 
 export default class HeaderPrice extends Component {
-  constructor() {
-    super()
-    this.state = {
-      year: 2019,
-      month: 9,
-      totalInCome: 0,
-      totalOutCome: 0
-    }
-  }
-
   changeTime = ({ year, month }) => {
-    this.setState({
+    this.props.changeState({
       year,
       month
     })
@@ -24,13 +14,13 @@ export default class HeaderPrice extends Component {
     return (
       <div className={HeaderPriceCss['header_price']}>
         <TimePicker
-          year={this.state.year}
-          month={this.state.month}
+          year={this.props.time.year}
+          month={this.props.time.month}
           onChange={this.changeTime}
         />
         <TotalPrice
-          totalInCome={this.state.totalInCome}
-          totalOutCome={this.state.totalOutCome}
+          totalInCome={this.props.total.inCome}
+          totalOutCome={this.props.total.outCome}
         ></TotalPrice>
       </div>
     )

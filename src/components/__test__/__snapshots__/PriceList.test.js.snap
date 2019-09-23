@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test PriceList component should render the compinent to match snapshot 1`] = `ShallowWrapper {}`;

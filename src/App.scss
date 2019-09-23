@@ -50,7 +50,9 @@
 }
 
 .App {
-  background-color: #fff;
-  margin: 20px 50px;
+  padding: 20px 50px;
   border-radius: 4px;
+  > div {
+    background-color: #fff;
+  }
 }

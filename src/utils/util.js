@@ -5,3 +5,8 @@ export const range = (size, startAt = 0) => {
   }
   return arr
 }
+
+// 不满10补0
+export const repairZero = num => {
+  return num < 10 ? `0${num}` : num
+}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Menu, Dropdown, Icon, Button, Input } from 'antd'
+import { Menu, Dropdown, Icon, Input } from 'antd'
 import TimePickerClass from './TimePicker.module.scss'
 import './TimePicker.scss'
 import { range } from 'utils/util'

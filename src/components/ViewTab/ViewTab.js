@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { Tabs, Icon, Button } from 'antd'
+import PropTypes from 'prop-types'
 
 import PriceList from '../PriceList'
 import './viewTab.scss'
 
 const { TabPane } = Tabs
 
-export default class ViewTab extends Component {
+class ViewTab extends Component {
   render() {
     return (
       <Tabs defaultActiveKey="1" className="book_tabs">
@@ -53,3 +54,9 @@ export default class ViewTab extends Component {
     )
   }
 }
+
+ViewTab.propTypes = {
+  list: PropTypes.array.isRequired
+}
+
+export default ViewTab

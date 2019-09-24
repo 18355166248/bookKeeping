@@ -1,5 +1,6 @@
 import React from 'react'
 import { shallow } from 'enzyme'
+import toJson from 'enzyme-to-json'
 import PriceList from '../PriceList'
 import { constList, categoryList } from '../../mock'
 
@@ -9,12 +10,18 @@ const list = constList.map(v => {
 })
 
 let wrapper
-describe('test PriceList component', () => {
+describe('测试 PriceList 组件', () => {
   beforeEach(() => {
     wrapper = shallow(<PriceList list={list} />)
-    console.log(wrapper)
   })
-  it('should render the compinent to match snapshot', () => {
-    expect(wrapper).toMatchSnapshot()
+  it('匹配快照', () => {
+    expect(toJson(wrapper)).toMatchSnapshot()
+  })
+  it('PriceItem组件应该渲染了4个', () => {
+    expect(wrapper.find('PriceItem').length).toBe(4)
+  })
+  it('PriceList组件空数据的时候是否显示暂无数据', () => {
+    wrapper.setProps({list: []})
+    expect(wrapper.find('.empty_data').exists()).toBeTruthy()
   })
 })

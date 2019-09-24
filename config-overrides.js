@@ -1,5 +1,5 @@
 const path = require('path')
-const { override, fixBabelImports, addWebpackAlias } = require('customize-cra')
+const { override, fixBabelImports, addWebpackAlias, useBabelRc } = require('customize-cra')
 
 function pathResolve(dir) {
   return path.join(__dirname, dir)
@@ -16,5 +16,6 @@ module.exports = override(
     utils: pathResolve('src/utils'),
     components: pathResolve('src/components'),
     containers: pathResolve('src/containers')
-  })
+  }),
+  useBabelRc()
 )

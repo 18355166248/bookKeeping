@@ -7,7 +7,7 @@ class PriceList extends Component {
     return (
       <div style={{ borderTop: '1px solid #e8e8e9' }}>
         {this.props.list.length > 0 ? (
-          this.props.list.map((v, i) => <PriceItem {...v} key={i} />)
+          this.props.list.map((v, i) => <PriceItem {...v} key={i} index={i} />)
         ) : (
           <div
             className="ac m_t_10 m_t_10 empty_data"

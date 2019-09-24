@@ -1,8 +1,13 @@
+import { constList, categoryList } from '@/mock'
+
 const EDITLIST = 'EDITLIST'
 const DELLIST = 'DELLIST'
 
 const initState = {
-  list: []
+  list: constList.map(v => {
+    v.category = categoryList.find(v1 => v1.id === v.cid)
+    return v
+  })
 }
 export function listReducer(state = initState, action) {
   switch (action.type) {
@@ -21,5 +26,19 @@ export function listReducer(state = initState, action) {
       }
     default:
       return state
+  }
+}
+
+function editList(list) {
+  return {
+    type: EDITLIST,
+    list
+  }
+}
+
+function delList(index) {
+  return {
+    type: DELLIST,
+    index
   }
 }

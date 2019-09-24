@@ -17,10 +17,10 @@ exports[`测试 PriceList 组件 匹配快照 1`] = `
         "type": "outcome",
       }
     }
-    changeItem={[Function]}
     cid={1}
     date="2019-09-17"
     id={1}
+    index={0}
     key="0"
     price={1098}
     title="买了airPods"
@@ -34,10 +34,10 @@ exports[`测试 PriceList 组件 匹配快照 1`] = `
         "type": "outcome",
       }
     }
-    changeItem={[Function]}
     cid={1}
     date="2019-09-27"
     id={2}
+    index={1}
     key="1"
     price={7999}
     title="买了苹果11"
@@ -51,10 +51,10 @@ exports[`测试 PriceList 组件 匹配快照 1`] = `
         "type": "outcome",
       }
     }
-    changeItem={[Function]}
     cid={2}
     date="2019-08-27"
     id={3}
+    index={2}
     key="2"
     price={50}
     title="去日月光打车"
@@ -68,10 +68,10 @@ exports[`测试 PriceList 组件 匹配快照 1`] = `
         "type": "income",
       }
     }
-    changeItem={[Function]}
     cid={3}
     date="2019-09-15"
     id={4}
+    index={3}
     key="3"
     price={11111}
     title="8月份工资"

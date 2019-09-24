@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import ViewTab from 'components/ViewTab/ViewTab'
+import { connect } from 'react-redux'
 import HeaderPrice from 'components/HeaderPrice/HeaderPrice'
-import { constList, categoryList } from '@/mock'
 import { repairZero } from 'utils/util'
 import './App.scss'
 
+@connect(state => state)
 class App extends Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       time: {
         year: 2019,
@@ -21,18 +22,13 @@ class App extends Component {
     })
   }
   render() {
-    const list = constList
-      .map(v => {
-        v.category = categoryList.find(v1 => v1.id === v.cid)
-        return v
-      })
-      .filter(v => {
-        return (
-          v.date.indexOf(
-            `${this.state.time.year}-${repairZero(this.state.time.month)}`
-          ) > -1
-        )
-      })
+    const list = this.props.listReducer.list.filter(v => {
+      return (
+        v.date.indexOf(
+          `${this.state.time.year}-${repairZero(this.state.time.month)}`
+        ) > -1
+      )
+    })
     const total = {
       inCome: 0,
       outCome: 0

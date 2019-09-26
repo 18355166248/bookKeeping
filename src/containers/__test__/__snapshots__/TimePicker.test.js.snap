@@ -1,0 +1,191 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`测试 Timepicker 组件 匹配快照 1`] = `
+<Dropdown
+  mouseEnterDelay={0.15}
+  mouseLeaveDelay={0.1}
+  overlay={
+    <Menu
+      className="drop_down_menu"
+    >
+      <MenuItem
+        className="time_picker_menu_item"
+      >
+        <div
+          className="drop_down"
+        >
+          <div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2015
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2016
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2017
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2018
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2019
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2020
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2021
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2022
+               年
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2023
+               年
+            </div>
+          </div>
+          <div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              1
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              2
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              3
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              4
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              5
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              6
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              7
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              8
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              9
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              10
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              11
+               月
+            </div>
+            <div
+              className=" common_cell"
+              onClick={[Function]}
+            >
+              12
+               月
+            </div>
+          </div>
+        </div>
+      </MenuItem>
+    </Menu>
+  }
+  placement="bottomLeft"
+  trigger={
+    Array [
+      "click",
+    ]
+  }
+>
+  <Input
+    className="btn "
+    readOnly={true}
+    suffix={
+      <Icon
+        type="calendar"
+      />
+    }
+    type="text"
+    value="2019 年 9 月"
+  />
+</Dropdown>
+`;

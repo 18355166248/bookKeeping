@@ -8,6 +8,7 @@ import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import InitRoute from 'components/InitRoute/InitRoute'
+import Create from 'components/Create'
 import reducer from './redux'
 
 const store = createStore(reducer, applyMiddleware(thunk))
@@ -18,7 +19,9 @@ ReactDOM.render(
       <div>
         <InitRoute />
         <Switch>
-          <Route path="/home" component={App} />
+          <Route path="/home" exact component={App} />
+          <Route path="/create" exact component={Create} />
+          <Route path="/edit/:id" exact component={Create} />
         </Switch>
       </div>
     </Router>

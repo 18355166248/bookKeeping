@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { Button, Icon } from 'antd'
 import PriceItemScss from './priceItem.module.scss'
+import { withRouter } from 'react-router-dom'
 
-export default class PriceItem extends Component {
+export class PriceItem extends Component {
   edit = () => {
-    return this.props
+    this.props.history && this.props.history.push(`/edit/${this.props.id}`)
   }
   del = () => {
     return this.props
@@ -42,3 +43,5 @@ export default class PriceItem extends Component {
     )
   }
 }
+
+export default withRouter(PriceItem)

@@ -1,6 +1,6 @@
 import React from 'react'
-import { shallow } from 'enzyme'
-import PriceItem from '../priceItem/priceItem'
+import { mount } from 'enzyme'
+import { PriceItem } from '../priceItem/priceItem'
 import { constList, categoryList } from '../../mock'
 
 const list = constList.map(v => {
@@ -11,10 +11,16 @@ const list = constList.map(v => {
 let wrapper
 describe('测试 PriceItem组件', () => {
   beforeEach(() => {
-    wrapper = shallow(<PriceItem {...list[0]} key={0} index={0} />)
+    wrapper = mount(<PriceItem {...list[0]} key={0} index={0} />)
   })
   it('图标是否渲染成功', () => {
-    expect(wrapper.find('.price_item_icon').exists()).toBeTruthy()
+    expect(
+      wrapper
+        .find(PriceItem)
+        .children()
+        .find('.price_item_icon')
+        .exists()
+    ).toBeTruthy()
   })
   it('测试事件是否执行', () => {
     const editFun = jest.spyOn(wrapper.instance(), 'edit')

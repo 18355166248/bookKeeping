@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Menu, Dropdown, Icon, Input } from 'antd'
 import TimePickerClass from './TimePicker.module.scss'
 import './TimePicker.scss'
-import { range } from 'utils/util'
+import { range } from '../../utils/util'
 
 export default class TimePicker extends Component {
   selectTime = (type, value) => {

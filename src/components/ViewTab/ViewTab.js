@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Tabs, Icon, Button } from 'antd'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 import PriceList from '../PriceList'
@@ -7,7 +8,11 @@ import './viewTab.scss'
 
 const { TabPane } = Tabs
 
+@withRouter
 class ViewTab extends Component {
+  createNewBook = () => {
+    this.props.history.push('/create')
+  }
   render() {
     return (
       <Tabs defaultActiveKey="1" className="book_tabs">
@@ -24,7 +29,12 @@ class ViewTab extends Component {
           key="1"
         >
           <div style={{ padding: '10px 20px' }}>
-            <Button type="primary" style={{ width: '100%' }} className="m_b_20">
+            <Button
+              type="primary"
+              style={{ width: '100%' }}
+              className="m_b_20"
+              onClick={this.createNewBook}
+            >
               <Icon
                 type="plus-circle"
                 theme="filled"

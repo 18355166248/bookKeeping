@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './index.css'
+import './index.scss'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 import { createStore, applyMiddleware } from 'redux'
@@ -16,10 +16,10 @@ const store = createStore(reducer, applyMiddleware(thunk))
 ReactDOM.render(
   <Provider store={store}>
     <Router>
-      <div>
+      <div id="main_body">
         <InitRoute />
         <Switch>
-          <Route path="/home" exact component={App} />
+          <Route path="/" exact component={App} />
           <Route path="/create" exact component={Create} />
           <Route path="/edit/:id" exact component={Create} />
         </Switch>

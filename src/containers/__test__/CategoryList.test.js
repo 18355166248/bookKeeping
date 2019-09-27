@@ -5,13 +5,13 @@ import { categoryList } from '../../mock'
 
 let props = {
   categoryList,
-  onSelectCatogory: jest.fn()
+  onSelectCategory: jest.fn()
 }
 
 let props_with_catogory = {
   categoryList,
-  onSelectCatogory: jest.fn(),
-  selectCategory: [categoryList[0]]
+  onSelectCategory: jest.fn(),
+  selectCategory: categoryList[0]
 }
 
 describe('渲染 Categorylist 组件', () => {
@@ -34,5 +34,11 @@ describe('渲染 Categorylist 组件', () => {
   it('传入数据高亮', () => {
     const wrapper = mount(<CategoryList {...props_with_catogory} />)
     expect(wrapper.find('.category_items.active').length).toEqual(1)
+  })
+  it('点击进行高亮', () => {
+    const wrapper = mount(<CategoryList {...props_with_catogory} />)
+    wrapper.find('.category_items').at(1).simulate('click')
+    expect(props_with_catogory.onSelectCategory).toHaveBeenCalledWith(categoryList[1])
+    expect(wrapper.find('.category_items').at(1).hasClass('active')).toEqual(true)
   })
 })

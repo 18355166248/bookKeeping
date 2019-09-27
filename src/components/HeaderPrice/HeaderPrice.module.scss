@@ -1,6 +1,8 @@
 .header_price {
-  display: flex;
-  padding: 30px 20px;
   background-color: black;
-  border-radius: 4px;
+  .header_price_b {
+    display: flex;
+    padding: 0 20px 30px 20px;
+    border-radius: 4px;
+  }
 }

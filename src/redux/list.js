@@ -7,7 +7,8 @@ const initState = {
   list: constList.map(v => {
     v.category = categoryList.find(v1 => v1.id === v.cid)
     return v
-  })
+  }),
+  categoryList
 }
 export function listReducer(state = initState, action) {
   switch (action.type) {

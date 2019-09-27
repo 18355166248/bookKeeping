@@ -1,0 +1,84 @@
+body,
+html {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(221, 219, 219) !important;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.w100 {
+  width: 100%;
+}
+.h100 {
+  height: 100%;
+}
+.wh100 {
+  width: 100%;
+  height: 100%;
+}
+.m_l_10 {
+  margin-left: 10px;
+}
+.m_l_20 {
+  margin-left: 20px;
+}
+
+.m_t_10 {
+  margin-top: 10px;
+}
+.m_t_20 {
+  margin-top: 20px;
+}
+
+.m_b_10 {
+  margin-bottom: 10px;
+}
+.m_b_20 {
+  margin-bottom: 20px;
+}
+
+.m_r_10 {
+  margin-right: 10px;
+}
+.m_r_20 {
+  margin-right: 20px;
+}
+
+.ac {
+  text-align: center;
+}
+
+.po100 {
+  width: 100%;
+  height: 100%;
+  line-height: 30px;
+}
+
+.ver_m {
+  vertical-align: middle !important;
+}
+.ver_s {
+  vertical-align: sub !important;
+}
+.ver_t {
+  vertical-align: top !important;
+}
+.ver_t_t {
+  vertical-align: text-top !important;
+}
+
+#main_body {
+  padding: 20px 50px;
+  border-radius: 4px;
+  > div {
+    background-color: #fff;
+  }
+}

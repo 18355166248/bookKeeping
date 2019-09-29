@@ -5,6 +5,8 @@ import HeaderPrice from 'components/HeaderPrice/HeaderPrice'
 import { repairZero } from 'utils/util'
 import './App.scss'
 
+export const MyContext = React.createContext()
+
 @connect(state => state)
 class App extends Component {
   constructor(props) {
@@ -42,16 +44,18 @@ class App extends Component {
     })
 
     return (
-      <div className="App">
-        <div>
-          <HeaderPrice
-            changeState={this.changeState}
-            time={this.state.time}
-            total={total}
-          ></HeaderPrice>
-          <ViewTab list={list}></ViewTab>
+      <MyContext.Provider value={{ name: 123 }}>
+        <div className="App">
+          <div>
+            <HeaderPrice
+              changeState={this.changeState}
+              time={this.state.time}
+              total={total}
+            ></HeaderPrice>
+            <ViewTab list={list}></ViewTab>
+          </div>
         </div>
-      </div>
+      </MyContext.Provider>
     )
   }
 }

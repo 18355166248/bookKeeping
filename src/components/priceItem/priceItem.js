@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon } from 'antd'
+import { Button, Icon, Popconfirm, message } from 'antd'
 import PriceItemScss from './priceItem.module.scss'
 import { withRouter } from 'react-router-dom'
 
@@ -9,6 +9,10 @@ export class PriceItem extends Component {
   }
   del = () => {
     return this.props
+  }
+  confirm = e => {
+    console.log(e)
+    message.success('Click on Yes')
   }
   render() {
     return (
@@ -32,12 +36,19 @@ export class PriceItem extends Component {
             className="m_r_10"
             onClick={this.edit}
           ></Button>
-          <Button
-            shape="circle"
-            type="danger"
-            icon="close"
-            onClick={this.del}
-          ></Button>
+          <Popconfirm
+            title="确定删除这条记录么?"
+            onConfirm={this.confirm}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button
+              shape="circle"
+              type="danger"
+              icon="close"
+              onClick={this.del}
+            ></Button>
+          </Popconfirm>
         </div>
       </div>
     )

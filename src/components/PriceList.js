@@ -1,8 +1,13 @@
 import React, { Component } from 'react'
 import PriceItem from './priceItem/priceItem'
 import PropTypes from 'prop-types'
+import WithContext from 'containers/WithContext'
 
+@WithContext
 class PriceList extends Component {
+  componentDidMount() {
+    console.log(this.props.data)
+  }
   render() {
     return (
       <div style={{ borderTop: '1px solid #e8e8e9' }}>

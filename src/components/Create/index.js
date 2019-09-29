@@ -7,28 +7,33 @@ import { connect } from 'react-redux'
 import './index.scss'
 const { TabPane } = Tabs
 
-function callback(key) {
-  console.log(key)
-}
-
 @connect(state => state)
 class Create extends Component {
   onSelectCategory = () => {}
   render() {
     const { categoryList } = this.props.listReducer
-    const props = {
-      categoryList,
+    const inprops = {
+      categoryList: categoryList.filter(v => v.type === 'income'),
+      onSelectCategory: this.onSelectCategory,
+      selectCategory: categoryList[0]
+    }
+    const outprops = {
+      categoryList: categoryList.filter(v => v.type === 'outcome'),
       onSelectCategory: this.onSelectCategory,
       selectCategory: categoryList[0]
     }
     return (
       <div>
         <HeaderTitle></HeaderTitle>
-        <Tabs defaultActiveKey="1" onChange={callback} className="create_tabs">
-          <TabPane tab="支出" key="1"></TabPane>
-          <TabPane tab="收入" key="2"></TabPane>
+        <Tabs defaultActiveKey="1" className="create_tabs">
+          <TabPane tab="支出" key="1">
+            <CategoryList {...inprops}></CategoryList>
+          </TabPane>
+          <TabPane tab="收入" key="2">
+            <CategoryList {...outprops}></CategoryList>
+          </TabPane>
         </Tabs>
-        <CategoryList {...props}></CategoryList>
+
         <PriceForm className="pirce_form"></PriceForm>
       </div>
     )

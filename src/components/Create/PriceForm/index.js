@@ -1,8 +1,14 @@
 import React, { Component } from 'react'
 import { Form, Input, DatePicker, Button } from 'antd'
+import { connect } from 'react-redux'
+import { add } from '@/redux/list'
 import { withRouter } from 'react-router-dom'
 
 @withRouter
+@connect(
+  {},
+  { add }
+)
 class PriceForm extends Component {
   onChangeDate = () => {}
 
@@ -12,6 +18,7 @@ class PriceForm extends Component {
       if (!err) {
         values.date = values.date.format('YYYY-MM-DD')
         console.log(values)
+        this.props.add(values)
       }
     })
   }

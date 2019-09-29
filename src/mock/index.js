@@ -37,36 +37,55 @@ export const categoryList = [
   {
     id: 1,
     name: '电子',
+    type: 'income',
     iconName: 'money-collect'
   },
   {
     id: 2,
     name: '出行',
+    type: 'income',
     iconName: 'car'
   },
   {
     id: 3,
     name: '旅游',
+    type: 'income',
     iconName: 'sketch'
   },
   {
     id: 4,
     name: '工资',
+    type: 'outcome',
     iconName: 'dollar'
   },
   {
     id: 5,
     name: '购物',
+    type: 'income',
     iconName: 'shopping'
   },
   {
     id: 6,
     name: '生活',
+    type: 'income',
     iconName: 'home'
   },
   {
     id: 7,
     name: '其他',
+    type: 'income',
     iconName: 'cloud'
+  },
+  {
+    id: 8,
+    name: '兼职',
+    type: 'outcome',
+    iconName: 'credit-card'
+  },
+  {
+    id: 9,
+    name: '理财',
+    type: 'outcome',
+    iconName: 'property-safety'
   }
 ]

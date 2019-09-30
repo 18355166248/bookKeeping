@@ -18,8 +18,8 @@ export const repairZero = num => {
  */
 export const handleLocalStorage = (key, val) => {
   if (val || val === 0) {
-    window.localStorage.setItem(key, val)
+    window.localStorage.setItem(key, JSON.stringify(val))
   } else {
-    return window.localStorage.getItem(key)
+    return JSON.parse(window.localStorage.getItem(key))
   }
 }

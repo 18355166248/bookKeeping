@@ -26,7 +26,7 @@ class App extends Component {
   render() {
     const list = this.props.listReducer.list.filter(v => {
       return (
-        v.date.indexOf(
+        v.date && v.date.indexOf(
           `${this.state.time.year}-${repairZero(this.state.time.month)}`
         ) > -1
       )

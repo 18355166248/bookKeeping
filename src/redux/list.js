@@ -7,34 +7,28 @@ const DELLIST = 'DELLIST'
 
 const list = handleLocalStorage('list')
 const initState = {
-  list: list
-    ? list.map(v => {
-        v.category = categoryList.find(v1 => v1.id === v.cid)
-        return v
-      })
-    : [],
+  list: list || [],
   categoryList
 }
 export function listReducer(state = initState, action) {
   switch (action.type) {
     case ADDLIST:
-      return {
-        ...state,
-        list: state.list.push(action.list)
-      }
+      state.list.push(action.list)
+      handleLocalStorage('list', state.list)
+      return state
     case EDITLIST:
       state.list[action.index] = action.list
-      return {
-        ...state,
-        list: state.list
-      }
+      handleLocalStorage('list', state.list)
+      return state
     case DELLIST:
+      const list = [
+        ...state.list.slice(0, action.index),
+        ...state.list.slice(action.index + 1)
+      ]
+      handleLocalStorage('list', list)
       return {
         ...state,
-        list: [
-          ...state.list.slice(0, action.index),
-          ...state.list.slice(action.index + 1)
-        ]
+        list
       }
     default:
       return state
@@ -62,8 +56,20 @@ function delList(index) {
   }
 }
 
-export const add = list => {
+export const add = ({ list }) => {
   return dispatch => {
     dispatch(addList(list))
+  }
+}
+
+export const edit = ({ index, list }) => {
+  return dispatch => {
+    dispatch(editList(index, list))
+  }
+}
+
+export const del = index => {
+  return dispatch => {
+    dispatch(delList(index))
   }
 }

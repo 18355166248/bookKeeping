@@ -5,9 +5,6 @@ import WithContext from 'containers/WithContext'
 
 @WithContext
 class PriceList extends Component {
-  componentDidMount() {
-    console.log(this.props.data)
-  }
   render() {
     return (
       <div style={{ borderTop: '1px solid #e8e8e9' }}>

@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Button, Icon, Popconfirm, message } from 'antd'
 import PriceItemScss from './priceItem.module.scss'
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { del } from '@/redux/list'
 
 export class PriceItem extends Component {
   edit = () => {
@@ -11,16 +13,15 @@ export class PriceItem extends Component {
     return this.props
   }
   confirm = e => {
-    console.log(e)
-    message.success('Click on Yes')
+    this.props.del(this.props.index)
   }
   render() {
     return (
       <div className={PriceItemScss['price_item']}>
         <Icon
-          className="price_item_icon"
+          className={`price_item_icon ${PriceItemScss['price_item_icon']}`}
           type={this.props.category.iconName}
-          style={{ color: '#1296db', fontSize: '20px' }}
+          style={{ color: '#1296db', fontSize: '25px' }}
         />
         <span>{this.props.title}</span>
         <span style={{ fontWeight: 700 }}>
@@ -28,12 +29,12 @@ export class PriceItem extends Component {
           {this.props.price} 元
         </span>
         <span>{this.props.date}</span>
-        <div className="operation">
+        <div className={`operation ${PriceItemScss.operation}`}>
           <Button
             shape="circle"
             type="primary"
             icon="form"
-            className="m_r_10"
+            style={{ marginRight: '30px' }}
             onClick={this.edit}
           ></Button>
           <Popconfirm
@@ -55,4 +56,10 @@ export class PriceItem extends Component {
   }
 }
 
-export default withRouter(PriceItem)
+PriceItem = withRouter(PriceItem)
+const Connect = connect(
+  null,
+  { del }
+)
+
+export default Connect(PriceItem)

@@ -1,14 +1,9 @@
 import React, { Component } from 'react'
 import { Form, Input, DatePicker, Button } from 'antd'
-import { connect } from 'react-redux'
-import { add } from '@/redux/list'
 import { withRouter } from 'react-router-dom'
+import moment from 'moment'
 
 @withRouter
-@connect(
-  {},
-  { add }
-)
 class PriceForm extends Component {
   onChangeDate = () => {}
 
@@ -17,13 +12,13 @@ class PriceForm extends Component {
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         values.date = values.date.format('YYYY-MM-DD')
-        console.log(values)
-        this.props.add(values)
+        this.props.submit(values)
       }
     })
   }
   render() {
     const { getFieldDecorator } = this.props.form
+    const { title, price, date } = this.props.value
 
     const formItemLayout = {
       labelCol: {
@@ -38,6 +33,7 @@ class PriceForm extends Component {
         <Form {...formItemLayout} onSubmit={this.handleSubmit}>
           <Form.Item label="标题">
             {getFieldDecorator('title', {
+              initialValue: title,
               rules: [
                 {
                   required: true,
@@ -48,7 +44,8 @@ class PriceForm extends Component {
             })(<Input />)}
           </Form.Item>
           <Form.Item label="金额">
-            {getFieldDecorator('amount', {
+            {getFieldDecorator('price', {
+              initialValue: price,
               rules: [
                 {
                   required: true,
@@ -60,6 +57,7 @@ class PriceForm extends Component {
           </Form.Item>
           <Form.Item label="日期">
             {getFieldDecorator('date', {
+              initialValue: date ? moment(date) : null,
               rules: [
                 {
                   type: 'object',

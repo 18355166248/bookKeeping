@@ -3,18 +3,22 @@ import ViewTab from 'components/ViewTab/ViewTab'
 import { connect } from 'react-redux'
 import HeaderPrice from 'components/HeaderPrice/HeaderPrice'
 import { repairZero } from 'utils/util'
+import { changeDate } from '@/redux/list'
 import './App.scss'
 
 export const MyContext = React.createContext()
 
-@connect(state => state)
+@connect(
+  state => state,
+  { changeDate }
+)
 class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
       time: {
-        year: 2019,
-        month: 9
+        year: this.props.listReducer.year,
+        month: this.props.listReducer.month
       }
     }
   }
@@ -22,11 +26,13 @@ class App extends Component {
     this.setState({
       time
     })
+    this.props.changeDate(time)
   }
   render() {
     const list = this.props.listReducer.list.filter(v => {
       return (
-        v.date && v.date.indexOf(
+        v.date &&
+        v.date.indexOf(
           `${this.state.time.year}-${repairZero(this.state.time.month)}`
         ) > -1
       )
@@ -37,9 +43,9 @@ class App extends Component {
     }
     list.forEach(v => {
       if (v.category.type === 'income') {
-        total.inCome += v.price
+        total.inCome += Number(v.price)
       } else if (v.category.type === 'outcome') {
-        total.outCome += v.price
+        total.outCome += Number(v.price)
       }
     })
 

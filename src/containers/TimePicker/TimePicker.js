@@ -75,11 +75,9 @@ export default class TimePicker extends Component {
       <Dropdown overlay={menu} trigger={['click']}>
         <Input
           readOnly
-          value={
-            this.props.year && this.props.month ? `${year} 年 ${month} 月` : ''
-          }
+          value={year && month ? `${year} 年 ${month} 月` : ''}
           className={`${TimePickerClass.btn} ${
-            this.props.clearable && this.props.year && this.props.month
+            this.props.clearable && year && month
               ? TimePickerClass['clearable_show_btn']
               : ''
           }`}

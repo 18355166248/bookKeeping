@@ -5,6 +5,8 @@
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.6.0",
     "antd": "^3.23.4",
+    "axios": "^0.19.0",
+    "concurrently": "^5.0.0",
     "node-sass": "^4.12.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -15,10 +17,11 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "concurrently \"react-app-rewired start\" \"npm run mock\"",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test a",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "mock": "json-server --watch -p 3001 ./mock/index.json"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -41,6 +44,7 @@
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "^3.4.0",
+    "json-server": "^0.15.1",
     "react-app-rewired": "^2.1.3"
   }
 }

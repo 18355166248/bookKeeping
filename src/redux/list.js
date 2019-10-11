@@ -1,35 +1,40 @@
 import { categoryList } from '@/mock'
-import { handleLocalStorage } from '@/utils/util'
+import axios from '@/axios'
 
 const ADDLIST = 'ADDLIST'
 const EDITLIST = 'EDITLIST'
 const DELLIST = 'DELLIST'
+const CHANGEDATE = 'CHANGEDATE'
 
-const list = handleLocalStorage('list')
+// const list = handleLocalStorage('list')
 const initState = {
-  list: list || [],
-  categoryList
+  list: [],
+  categoryList,
+  year: new Date().getFullYear(),
+  month: new Date().getMonth() + 1
 }
 export function listReducer(state = initState, action) {
   switch (action.type) {
     case ADDLIST:
       state.list.push(action.list)
-      handleLocalStorage('list', state.list)
+      // handleLocalStorage('list', state.list) // 修改为axios请求 不需要存在localStorage
       return state
     case EDITLIST:
       state.list[action.index] = action.list
-      handleLocalStorage('list', state.list)
+      // handleLocalStorage('list', state.list) // 修改为axios请求 不需要存在localStorage
       return state
     case DELLIST:
       const list = [
         ...state.list.slice(0, action.index),
         ...state.list.slice(action.index + 1)
       ]
-      handleLocalStorage('list', list)
+      // handleLocalStorage('list', list) // 修改为axios请求 不需要存在localStorage
       return {
         ...state,
         list
       }
+    case CHANGEDATE:
+      return { ...state, ...action.date }
     default:
       return state
   }
@@ -56,6 +61,13 @@ function delList(index) {
   }
 }
 
+function dateChange(date) {
+  return {
+    type: CHANGEDATE,
+    date
+  }
+}
+
 export const add = ({ list }) => {
   return dispatch => {
     dispatch(addList(list))
@@ -71,5 +83,12 @@ export const edit = ({ index, list }) => {
 export const del = index => {
   return dispatch => {
     dispatch(delList(index))
+  }
+}
+
+// 修改year month
+export const changeDate = date => {
+  return dispatch => {
+    dispatch(dateChange(date))
   }
 }

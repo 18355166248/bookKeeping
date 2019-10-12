@@ -1,13 +1,13 @@
 import axios from 'axios'
 import { message } from 'antd'
-import { devProt, prodProt } from './'
+import { devProt, prodProt } from '@/config'
 
 /**
  * 提示函数
  * 禁止点击蒙层、显示一秒后关闭
  */
 const tip = msg => {
-  message.error(msg);
+  message.error(msg)
 }
 
 /**
@@ -27,8 +27,8 @@ const errorHandle = (status, other) => {
 
 // 创建axios实例
 var instance = axios.create({
-  timeout: 1000 * 12,
-  baseURL: process.env.NODE_ENV === 'development' ? devProt : prodProt
+  timeout: 1000 * 12
+  // baseURL: process.env.NODE_ENV === 'development' ? devProt : prodProt
 })
 // 设置post请求头
 instance.defaults.headers.post['Content-Type'] =

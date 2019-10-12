@@ -1,6 +1,6 @@
-import { categoryList } from '@/mock'
 import axios from '@/axios'
 
+const INITLIST = 'INITLIST'
 const ADDLIST = 'ADDLIST'
 const EDITLIST = 'EDITLIST'
 const DELLIST = 'DELLIST'
@@ -9,12 +9,15 @@ const CHANGEDATE = 'CHANGEDATE'
 // const list = handleLocalStorage('list')
 const initState = {
   list: [],
-  categoryList,
+  categoryList: [],
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1
 }
 export function listReducer(state = initState, action) {
   switch (action.type) {
+    case INITLIST:
+      state = { ...state, ...action.list }
+      return state
     case ADDLIST:
       state.list.push(action.list)
       // handleLocalStorage('list', state.list) // 修改为axios请求 不需要存在localStorage
@@ -37,6 +40,13 @@ export function listReducer(state = initState, action) {
       return { ...state, ...action.date }
     default:
       return state
+  }
+}
+
+function initList(list) {
+  return {
+    type: INITLIST,
+    list
   }
 }
 
@@ -65,6 +75,26 @@ function dateChange(date) {
   return {
     type: CHANGEDATE,
     date
+  }
+}
+
+// 初始化数据
+export const init = () => {
+  return dispatch => {
+    Promise.all([axios.get('/constList'), axios.get('/categoryList')]).then(
+      res => {
+        const arr = res[0].data.map(v => {
+          const vv = res[1].data.find(v1 => v1.id === v.cid)
+          vv && (v.category = vv)
+          return v
+        })
+        const list = {
+          list: arr,
+          categoryList: res[1].data
+        }
+        dispatch(initList(list))
+      }
+    )
   }
 }
 

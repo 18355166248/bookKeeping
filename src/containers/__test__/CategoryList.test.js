@@ -1,6 +1,6 @@
 import React from 'react'
 import { mount } from 'enzyme'
-import CategoryList from '../CategorySelect'
+import CategoryList from '../CategoryList'
 import { categoryList } from '../../mock'
 
 let props = {

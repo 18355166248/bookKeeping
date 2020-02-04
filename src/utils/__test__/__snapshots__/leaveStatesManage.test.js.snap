@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`测试 LeaveStatesMange 匹配快照 1`] = `
+Blocking {
+  "_statusId": 0,
+  "chainSymbol": ".",
+  "leaveStates": Object {
+    "id": 0,
+  },
+}
+`;

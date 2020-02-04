@@ -9,7 +9,11 @@ import thunk from 'redux-thunk'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import InitRoute from 'components/InitRoute/InitRoute'
 import Create from 'components/Create'
+import FormDemo from 'components/Form/Form'
+import FormDemo22 from 'components/Form/FormDemo'
+import Lang from 'components/Lang/Lang'
 import reducer from './redux'
+import { data } from 'components/Form/data';
 
 const store = createStore(reducer, applyMiddleware(thunk))
 
@@ -22,6 +26,12 @@ ReactDOM.render(
           <Route path="/" exact component={App} />
           <Route path="/create" exact component={Create} />
           <Route path="/edit/:id" exact component={Create} />
+          <Route path="/form" exact>
+            <FormDemo data={data} />
+          </Route>
+          <Route path="/lang" exact>
+            <Lang />
+          </Route>
         </Switch>
       </div>
     </Router>

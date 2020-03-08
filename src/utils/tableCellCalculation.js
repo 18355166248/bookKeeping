@@ -1,29 +1,35 @@
-function getUnitAndOffset(data) {
-  const arrAreaList = [];
+import _ from "lodash";
+const noContainKeys = ["hour", "minute"];
+
+// 说明:
+// dataIndex表示data下的索引
+// colIndex表示apptList下的索引
+
+function getUnitAndOffset(dataList) {
+  const data = _.cloneDeep(dataList);
+  const arrAreaList = {};
 
   data.forEach((dataItem, dataIndex) => {
     Object.keys(dataItem).forEach(dataItemKey => {
-      if (dataItemKey.indexOf("col_") > -1) {
+      if (!noContainKeys.includes(dataItemKey)) {
         // 表示每一列的单元格
-        const colList = dataItem[dataItemKey];
+        const colList = dataItem[dataItemKey].apptList;
         // 表示哪一列, 按列进行分组
-        const colIndex = dataItemKey.replace("col_", "");
-
-        if (!Array.isArray(arrAreaList[colIndex])) {
-          arrAreaList[colIndex] = [];
+        if (!Array.isArray(arrAreaList[dataItemKey])) {
+          arrAreaList[dataItemKey] = [];
         }
 
-        const areaList = arrAreaList[colIndex];
+        const areaList = arrAreaList[dataItemKey];
 
         colList.forEach((col, colIndex) => {
           // 每一列中的每一个预约 生成最大值, 最小值区间
           let area = {};
 
-          const { config } = col;
+          const { startTimestamp, endTimestamp } = col;
 
           area = {
-            min: config.startRow,
-            max: config.startRow + config.rowNumber - 1,
+            min: startTimestamp,
+            max: endTimestamp,
             ...col,
             dataIndex,
             colIndex,
@@ -49,143 +55,96 @@ function getUnitAndOffset(data) {
           }
         });
 
-        /**
-         * areaList代表分组之后的数据, 每一组都和其他组没有交集
-         * 然后在分组里面将每组按行分类
-         * 按行从上至下按照盒子的高度也就是rowNumber进行降序排列
-         */
-        areaList.forEach(area => {
-          // 将每组相同行的数据放在一个对象下 对象名就是当前行的索引 从0开始
-          const colList = {};
-          let placeList = [];
-          // 当前组的最小值和当前组的最大值, 依靠这个生成位置信息
-          let min = Math.min(...area.map(areaItem => areaItem.min));
-          let max = Math.max(...area.map(areaItem => areaItem.max));
-          let unit = 0;
-
-          area.forEach(areaItem => {
-            if (colList[areaItem.dataIndex]) {
-              colList[areaItem.dataIndex].push(areaItem);
-            } else {
-              colList[areaItem.dataIndex] = [areaItem];
-            }
-          });
-
-          // 遍历每个分组下每行的预约列表
-          Object.keys(colList).forEach(col => {
-            // 按照数组下的config.rowNumber进行降序排列
-            colList[col].sort(
-              (a, b) => b.config.rowNumber - a.config.rowNumber
-            );
-
-            // 初始化unit为当前组下预约列表的最大长度
-            unit = colList[col].length > unit ? colList[col].length : unit;
-
-            // colList[col] 为降序排列的预约列表
-            colList[col].forEach((colChildItem, colChildIndex) => {
-              for (let i = min; i <= max; i++) {
-                // 生成位置信息 例如: 0.0 1.0 2.0
-                const name = String(i) + "." + String(colChildIndex);
-
-                if (placeList.findIndex(place => place.name === name) === -1) {
-                  placeList.push({ name });
-                }
-              }
-
-              // 生成当前盒子所占区域的位置信息, 并设置已被占用位置标识
-              const copyUnit = setPlaceInfo(
-                placeList,
-                colChildIndex,
-                colChildItem,
-                unit,
-                colList
-              );
-
-              unit = copyUnit > unit ? copyUnit : unit;
-            });
-          });
-
-          // 通过 placeList 去找到data对应的模块进行赋值
-          placeList.forEach(place => {
-            if (place.info) {
-              const { dataIndex, colIndex, parentKey } = place.info;
-
-              if (data[dataIndex][parentKey][colIndex]) {
-                data[dataIndex][parentKey][colIndex].config.offset =
-                  place.offset;
-                data[dataIndex][parentKey][colIndex].config.unit = unit;
-              }
-            }
-          });
-        });
+        arrAreaList[dataItemKey] = areaList;
       }
     });
   });
-}
 
-// 递归生成正确的位置数据
-function setPlaceInfo(placeList, colChildIndex, colChildItem, unit, colList) {
-  const { min, max } = colChildItem;
-  // 生成当前盒子所占区域
-  let curAreaArr = [];
+  Object.keys(arrAreaList).forEach(arrAreaKey => {
+    const arrArea = arrAreaList[arrAreaKey];
 
-  for (let i = min; i <= max; i++) {
-    curAreaArr.push(i + "." + colChildIndex);
-  }
+    arrArea.forEach(area => {
+      // 按列进行分组
+      const rowSortList = [];
+      // 生成当前组每列存在的最大值
+      let rowMaxArr = [];
 
-  const index = placeList.findIndex(place => place.name === curAreaArr[0]);
-
-  if (placeList[index]) {
-    if (!placeList[index].use) {
-      // 代表没有占用
-      curAreaArr.forEach(curArea => {
-        const index = placeList.findIndex(place => place.name === curArea);
-
-        if (index > -1) {
-          placeList[index].use = true;
-          placeList[index].offset = colChildIndex;
-          placeList[index].info = colChildItem;
+      area.forEach(areaItem => {
+        if (rowSortList[areaItem.dataIndex]) {
+          rowSortList[areaItem.dataIndex].push(areaItem);
+        } else {
+          rowSortList[areaItem.dataIndex] = [areaItem];
         }
       });
-    } else {
-      // 被占用了 需要重新计算curAreaArr
-      unit = setPlaceInfo(
-        placeList,
-        ++colChildIndex,
-        colChildItem,
-        unit,
-        colList
-      );
-    }
+
+      // 将rowSortList中的每组进行降序排列
+      rowSortList.forEach(rowSort => {
+        rowSort.sort((a, b) => b.max - a.max);
+      });
+
+      rowSortList.forEach(rowSort => {
+        rowSort.forEach((rowSortItem, rowSortIndex) => {
+          const { max, min } = rowSortItem;
+
+          // 判断当前列的数据在缓存rowMaxArr对应的数据中 哪个比较大, 大的话覆盖 并且更新rowMaxArr
+          // 小的话切换到下一列并判断大小
+          // 如果缓存区的值小于当前盒子的最小值, 那么证明没有交集
+          const isArea = (rowMaxArr[rowSortIndex] || 0) < min;
+
+          if (isArea) {
+            // 没有交集 更新缓存区值
+            rowMaxArr[rowSortIndex] = max;
+            // offset为当前降序后的索引位置
+            rowSortItem.$config = { offset: rowSortIndex };
+          } else {
+            // 存在交集 需要去下一列去判断 (递归判断)
+            getRowInfo(rowMaxArr, rowSortItem, rowSortIndex + 1);
+          }
+        });
+      });
+
+      // 更新unit (unit的值就是rowMaxArr长度)
+      const unit = rowMaxArr.length;
+
+      area.forEach(areaItem => {
+        areaItem.$config.unit = unit;
+      });
+    });
+  });
+
+  // console.log(arrAreaList, data);
+  Object.keys(arrAreaList).forEach(arrAreaKey => {
+    // 这一层表示的是每列的数据
+    const arrArea = arrAreaList[arrAreaKey];
+    arrArea.forEach(area => {
+      // 这一层表示的分组, 各组之间没有交集
+      area.forEach(areaItem => {
+        // 这一层表示每一个盒子
+        // 在这里给data赋值unit, offset
+        const { dataIndex, colIndex, parentKey, $config } = areaItem;
+
+        data[dataIndex][parentKey].apptList[colIndex].$config = $config;
+      });
+    });
+  });
+
+  return data;
+}
+
+/**
+ *
+ * @param {*} rowMaxArr 缓存区
+ * @param {*} rowSortItem 当前盒子
+ * @param {*} colPosition 预估盒子要添加的列, 有交集的话就要去下一列递归判断
+ */
+function getRowInfo(rowMaxArr, rowSortItem, colPosition) {
+  const { max, min } = rowSortItem;
+  if ((rowMaxArr[colPosition] || 0) < min) {
+    rowMaxArr[colPosition] = max;
+    rowSortItem.$config = { offset: colPosition };
   } else {
-    // 重新开辟一条数据
-    unit = colChildIndex + 1;
-
-    const keysList = Object.keys(colList);
-    keysList.push(String(Number(keysList[keysList.length - 1]) + 1));
-
-    keysList.forEach(colKey => {
-      const name = String(colKey) + "." + String(colChildIndex);
-      const colKeyIndex = placeList.findIndex(place => place.name === name);
-
-      if (colKeyIndex === -1) {
-        placeList.push({ name });
-      }
-    });
-
-    // 判断 curAreaArr 是否爱placeList 如果在 要赋值 use
-    curAreaArr.forEach(curArea => {
-      const curIndex = placeList.findIndex(place => place.name === curArea);
-
-      if (curIndex > -1) {
-        placeList[curIndex].use = true;
-        placeList[curIndex].offset = colChildIndex;
-        placeList[curIndex].info = colChildItem;
-      }
-    });
+    getRowInfo(rowMaxArr, rowSortItem, colPosition + 1);
   }
-
-  return unit;
 }
 
 export default {

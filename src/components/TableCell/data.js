@@ -1,3 +1,5 @@
+import moment from "moment";
+
 const tableData = [
   {
     rowId: 0,
@@ -275,7 +277,7 @@ const tableData2 = [
           name: "第四行第一个预约 offset: 0 unit: 5"
         }
       }
-    ],
+    ]
   },
   {
     col_1: [
@@ -345,7 +347,281 @@ const tableData2 = [
   }
 ];
 
+const tableData3 = [
+  {
+    hour: {},
+    minute: {},
+    doctorId_1: {
+      apptList: [
+        {
+          patientName: "第一行第一个预约 offset: 0 unit: 3",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf()
+        },
+        {
+          patientName: "第一行第二个预约 offset: 2 unit: 3",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(9)
+            .minutes(19)
+            .endOf("minutes")
+            .valueOf()
+        },
+        {
+          patientName: "第一行第三个预约 offset: 1 unit: 3",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(10)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(9)
+            .minutes(29)
+            .endOf("minutes")
+            .valueOf()
+        }
+      ]
+    },
+    doctorId_2: {
+      apptList: [
+        {
+          patientName: "第二列: 第一行第一个预约 offset: 0 unit: 1",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf()
+        }
+      ]
+    }
+  },
+  {
+    hour: {},
+    minute: {},
+    doctorId_1: {
+      apptList: [
+        {
+          patientName: "第二行第一个预约 offset: 2 unit: 3",
+          startTimestamp: moment()
+            .hours(10)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(38)
+            .endOf("minutes")
+            .valueOf()
+        },
+        {
+          patientName: "第二行第二个预约 offset: 1 unit: 3",
+          startTimestamp: moment()
+            .hours(10)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf()
+        }
+      ]
+    }
+  },
+  {
+    hour: {},
+    minute: {},
+    doctorId_1: {
+      apptList: [
+        {
+          patientName: "第三行第一个预约 offset: 0 unit: 1",
+          startTimestamp: moment()
+            .hours(20)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(20)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf()
+        }
+      ]
+    }
+  }
+];
+
+const expectTableData = [
+  {
+    hour: {},
+    minute: {},
+    doctorId_1: {
+      apptList: [
+        {
+          patientName: "第一行第一个预约 offset: 0 unit: 3",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf(),
+          $config: {
+            offset: 0,
+            unit: 3
+          }
+        },
+        {
+          patientName: "第一行第二个预约 offset: 2 unit: 3",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(9)
+            .minutes(19)
+            .endOf("minutes")
+            .valueOf(),
+          $config: {
+            offset: 2,
+            unit: 3
+          }
+        },
+        {
+          patientName: "第一行第三个预约 offset: 1 unit: 3",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(10)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(9)
+            .minutes(29)
+            .endOf("minutes")
+            .valueOf(),
+          $config: {
+            offset: 1,
+            unit: 3
+          }
+        }
+      ]
+    },
+    doctorId_2: {
+      apptList: [
+        {
+          patientName: "第二列: 第一行第一个预约 offset: 0 unit: 1",
+          startTimestamp: moment()
+            .hours(9)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf(),
+          $config: {
+            offset: 0,
+            unit: 1
+          }
+        }
+      ]
+    }
+  },
+  {
+    hour: {},
+    minute: {},
+    doctorId_1: {
+      apptList: [
+        {
+          patientName: "第二行第一个预约 offset: 2 unit: 3",
+          startTimestamp: moment()
+            .hours(10)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(38)
+            .endOf("minutes")
+            .valueOf(),
+          $config: {
+            offset: 2,
+            unit: 3
+          }
+        },
+        {
+          patientName: "第二行第二个预约 offset: 1 unit: 3",
+          startTimestamp: moment()
+            .hours(10)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(10)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf(),
+          $config: {
+            offset: 1,
+            unit: 3
+          }
+        }
+      ]
+    }
+  },
+  {
+    hour: {},
+    minute: {},
+    doctorId_1: {
+      apptList: [
+        {
+          patientName: "第三行第一个预约 offset: 0 unit: 1",
+          startTimestamp: moment()
+            .hours(20)
+            .minutes(0)
+            .startOf("minutes")
+            .valueOf(),
+          endTimestamp: moment()
+            .hours(20)
+            .minutes(39)
+            .endOf("minutes")
+            .valueOf(),
+          $config: {
+            offset: 0,
+            unit: 1
+          }
+        }
+      ]
+    }
+  }
+];
+
 export default {
   tableData,
-  tableData2
+  tableData2,
+  tableData3,
+  expectTableData
 };

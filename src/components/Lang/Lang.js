@@ -1,23 +1,59 @@
-import React, { useEffect } from 'react';
-import { intlUtil } from 'utils/lang.util.js';
-import _ from 'lodash';
+import React, { useEffect } from "react";
+import { intlUtil } from "utils/lang.util.js";
+import _ from "lodash";
 
 const commonLangConfig = {
   ok: {
-    zh_CN: '确定',
-    en_US: 'ok',
+    zh_CN: "确定",
+    en_US: "ok"
   },
   cancel: {
-    zh_CN: '取消',
-    en_US: 'cancel',
+    zh_CN: "取消",
+    en_US: "cancel"
+  }
+};
+
+const nestedConfig = {
+  footer: {
+    zh_CN: "页底",
+    en_US: "footer",
+    label: {
+      zh_CN: "页底标题",
+      en_US: "Footer Label"
+    },
+    left: {
+      zh_CN: "页底左",
+      en_US: "Footer Left",
+      leftTop: {
+        zh_CN: "{{label}}页底左上{{num}}",
+        en_US: "{{lable}} Footer Left Top {{num}}"
+      }
+    }
   },
+  label: {
+    zh_CN: "标题",
+    en_US: "Label"
+  },
+  num: {
+    zh_CN: "数字",
+    en_US: "Number"
+  }
 };
 
 function Lang() {
   useEffect(() => {
-    const commonLang = intlUtil.proxy(commonLangConfig);
+    const commonLang = intlUtil.proxy(nestedConfig);
 
-    console.log('1.', commonLang.ok('zh_CN') === '确定');
+    console.log(commonLang.footer.left());
+    console.log(commonLang.footer);
+    // console.log("1.", commonLang.label);
+    // console.log(
+    //   "1.",
+    //   commonLang.footer.left.leftTop("en_US", {
+    //     label: commonLang.label("en_US")
+    //   })
+    // );
+    // console.log("1.", commonLang.footer);
 
     // console.log('2.', _.isEqual(commonLang.ok(), commonLangConfig.ok));
 
@@ -65,18 +101,14 @@ function Lang() {
     // console.log(includeVarLang.welcome('zh_CN', {
     //   name: '小明',
     // }))
-    
+
     // console.log(includeVarLang.fake('zh_CN', {
     //   name: '小明',
     //   address: '中国'
     // }))
-  }, [])
+  }, []);
 
-  return (
-    <div>
-      Lang
-    </div>
-  )
+  return <div>Lang</div>;
 }
 
 export default Lang;

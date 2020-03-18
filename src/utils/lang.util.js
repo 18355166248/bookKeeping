@@ -1,116 +1,114 @@
-import _ from 'lodash';
-
-const handler = {
-  set: function (obj, prop, value) {
-    if (_.isFunction(obj[prop])) {
-      Object
-        .keys(value)
-        .forEach(valueKey => {
-          obj[prop][valueKey] = value[valueKey];
-        });
-    } else {
-      obj[prop] = value;
-    }
-
-    return true;
-  },
-  get: function (target, propKey) {
-    if (_.isFunction(target[propKey])) {
-      return target[propKey];
-    }
-
-    return target[propKey];
-  },
-};
+import _ from "lodash";
 
 const intlUtil = {
   /**
    * 代理多语言配置
    * @param {object} langs
    */
+  params: {},
+  langProxy: null,
   proxy(langs) {
     if (!_.isPlainObject(langs)) {
-      throw new Error('params of lang must be object');
+      throw new Error("params of lang must be object");
     }
+    const _this = this;
+    let paramsStack = [];
 
-    const langProxy = new Proxy({}, handler);
-
-    Object
-      .keys(langs)
-      .forEach(langKey => {
-        let langValue = langs[langKey];
-
-        if (_.isFunction(langValue)) {
-          langValue = langValue();
+    const handler = {
+      apply: function(target, ctx, args) {
+        const targetValue = target();
+        if (typeof args[0] === "number") {
+          ctx.params["lang" + new Date().getTime()] = args[0];
+          return;
         }
+        // let langName = getObjeValue(targetValue, "targetValue", paramsStack);
 
-        if (_.isPlainObject(langValue)) {
-          // if (_.has(langValue, 'zh_CN') && _.has(langValue, 'en_US')) {
-          // 判断如果有zh_CN, en_US 表示符合规范
-          langProxy[langKey] = (language, params) => {
-            if (language) {
-              if (!_.isString(language)) {
-                throw new Error('params of language must be string');
-              }
+        console.log(_this);
 
-              if (langValue[language]) {
-                if (_.isPlainObject(params)) {
-                  return templateTranslate(langValue[language], params);
-                }
-
-                return langValue[language];
-              } else {
-                throw new Error('无此多语言配置：' + langKey);
-              }
-            }
-
-            return langValue;
-          };
-
-          const copyLangValue = _.cloneDeep(langValue);
-
-          delete copyLangValue.zh_CN;
-          delete copyLangValue.en_US;
-
-          if (Object.keys(copyLangValue).length > 0) {
-            const childFuncObj = this.proxy(copyLangValue);
-
-            langProxy[langKey] = childFuncObj;
+        // 如果执行函数传入了第一个参数
+        if (args[0]) {
+          if (typeof args[0] === "string") {
+            // langName = langName[args[0]];
           }
-        } else {
-          throw new Error('The first parameter of proxy is not in the correct format, expect function or object');
         }
-      });
 
-    return langProxy;
+        // 如果执行函数传入了第二个参数
+        if (args[1]) {
+          if (_.isPlainObject(args[1])) {
+            console.log(args[1]);
+          } else {
+            throw new Error(
+              "The second parameter to get a language must be an Object"
+            );
+          }
+        }
+
+        paramsStack = [];
+
+        return {};
+      },
+      get: function(target, propKey, proxy) {
+        const targetValue = target();
+        paramsStack.push(propKey);
+
+        return proxy;
+      }
+    };
+
+    this.langProxy = new Proxy(() => _.cloneDeep(langs), handler);
+
+    return this.filterProxy();
   },
+  filterProxy() {
+    const _this = this;
+    const proxy = new Proxy(
+      {
+        _params: []
+      },
+      {
+        get: function(target, propKey, proxy) {
+          if (propKey === "_params") {
+            return target._params;
+          }
+
+          proxy._params.push(propKey);
+
+          _this.langProxy(proxy._params.length - 1);
+
+          return _this.langProxy;
+        }
+      }
+    );
+
+    return proxy;
+  }
 };
 
 /**
- * 模板转换
- * @param {string} template 带有 {param}格式的字符串 就是需要转换的模板
- * @param {object} params 替换模板的参数
+ * 获取多层对象下的指定key的value
+ * @param {*} template
+ * @param {*} params
  */
-function templateTranslate(template, params) {
-  const reg = /\{\{(.*?)\}\}/g;
+function getObjeValue(obj, objName, paramsStack) {
+  const getValue = new Function(
+    objName,
+    `return ${objName}.${paramsStack.join(".")}`
+  );
 
-  const paramsList = template.match(reg);
+  const langName = _.cloneDeep(getValue(obj));
 
-  if (paramsList) {
-    // eslint-disable-next-line no-useless-escape
-    const paramsKeyList = paramsList.map(v => v.replace(/[\{, \}]/g, ''));
-
-    if (Array.isArray(paramsKeyList)) {
-      paramsKeyList
-        .forEach((paramsKey, paramsIndex) => {
-          if (_.has(params, paramsKey)) {
-            template = template.replace(paramsList[paramsIndex], params[paramsKey]);
-          }
-        });
-    }
+  if (!langName && !_.isPlainObject(langName)) {
+    throw new Error("无此多语言配置：" + paramsStack.join("."));
   }
 
-  return template;
+  // 删除所有子集数据
+  Object.keys(langName).forEach(lang => {
+    if (_.isPlainObject(langName[lang])) {
+      delete langName[lang];
+    }
+  });
+
+  return langName;
 }
 
 export { intlUtil };

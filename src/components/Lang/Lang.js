@@ -26,7 +26,7 @@ const nestedConfig = {
       en_US: "Footer Left",
       leftTop: {
         zh_CN: "{{label}}页底左上{{num}}",
-        en_US: "{{lable}} Footer Left Top {{num}}"
+        en_US: "{{label}} Footer Left Top {{num}}"
       }
     }
   },
@@ -44,15 +44,21 @@ function Lang() {
   useEffect(() => {
     const commonLang = intlUtil.proxy(nestedConfig);
 
-    console.log(commonLang.footer.left());
-    console.log(commonLang.footer);
-    // console.log("1.", commonLang.label);
     // console.log(
-    //   "1.",
-    //   commonLang.footer.left.leftTop("en_US", {
-    //     label: commonLang.label("en_US")
+    //   commonLang.footer.left.leftTop("zh_CN", {
+    //     label: "传入Label",
+    //     num: "传入Num"
     //   })
     // );
+    // console.log(
+    //   commonLang.footer.left.leftTop("en_US", {
+    //     label: commonLang.label("en_US"),
+    //     num: commonLang.num("en_US")
+    //   })
+    // );
+
+    console.log(commonLang.footer.left('zh_CN'))
+    console.log(commonLang.footer('en_US'))
     // console.log("1.", commonLang.footer);
 
     // console.log('2.', _.isEqual(commonLang.ok(), commonLangConfig.ok));

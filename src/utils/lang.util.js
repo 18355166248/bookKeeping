@@ -6,81 +6,53 @@ const intlUtil = {
    * @param {object} langs
    */
   params: {},
-  langProxy: null,
   proxy(langs) {
-    if (!_.isPlainObject(langs)) {
-      throw new Error("params of lang must be object");
-    }
+    const proxyList = {};
     const _this = this;
-    let paramsStack = [];
+    Object.keys(langs).forEach(langKey => {
+      const langValue = langs[langKey];
+      this.params[langKey] = [];
 
-    const handler = {
-      apply: function(target, ctx, args) {
-        const targetValue = target();
-        if (typeof args[0] === "number") {
-          ctx.params["lang" + new Date().getTime()] = args[0];
-          return;
-        }
-        // let langName = getObjeValue(targetValue, "targetValue", paramsStack);
+      proxyList[langKey] = new Proxy(() => [langValue, langKey], {
+        apply(target, object, args) {
+          const targetValue = target();
+          const langsList = targetValue[0];
+          let langValue = getObjeValue(
+            langsList,
+            "langsList",
+            _this.params[targetValue[1]]
+          );
 
-        console.log(_this);
+          _this.params[targetValue[1]] = [];
 
-        // 如果执行函数传入了第一个参数
-        if (args[0]) {
-          if (typeof args[0] === "string") {
-            // langName = langName[args[0]];
-          }
-        }
+          if (args[0]) {
+            if (typeof args[0] !== "string") {
+              throw new Error("调用函数第一个参数必须是字符串");
+            }
 
-        // 如果执行函数传入了第二个参数
-        if (args[1]) {
-          if (_.isPlainObject(args[1])) {
-            console.log(args[1]);
-          } else {
-            throw new Error(
-              "The second parameter to get a language must be an Object"
-            );
-          }
-        }
-
-        paramsStack = [];
-
-        return {};
-      },
-      get: function(target, propKey, proxy) {
-        const targetValue = target();
-        paramsStack.push(propKey);
-
-        return proxy;
-      }
-    };
-
-    this.langProxy = new Proxy(() => _.cloneDeep(langs), handler);
-
-    return this.filterProxy();
-  },
-  filterProxy() {
-    const _this = this;
-    const proxy = new Proxy(
-      {
-        _params: []
-      },
-      {
-        get: function(target, propKey, proxy) {
-          if (propKey === "_params") {
-            return target._params;
+            langValue = langValue[args[0]];
           }
 
-          proxy._params.push(propKey);
+          if (args[1]) {
+            if (!_.isPlainObject(args[1])) {
+              throw new Error("调用函数第二个参数必须是对象");
+            }
 
-          _this.langProxy(proxy._params.length - 1);
+            langValue = templateTranslate(langValue, args[1]);
+          }
 
-          return _this.langProxy;
+          return langValue;
+        },
+        get(target, key, receiver) {
+          const targetValue = target();
+          _this.params[targetValue[1]].push(key);
+
+          return receiver;
         }
-      }
-    );
+      });
+    });
 
-    return proxy;
+    return proxyList;
   }
 };
 
@@ -90,6 +62,10 @@ const intlUtil = {
  * @param {*} params
  */
 function getObjeValue(obj, objName, paramsStack) {
+  if (paramsStack.length === 0) {
+    return obj;
+  }
+
   const getValue = new Function(
     objName,
     `return ${objName}.${paramsStack.join(".")}`
@@ -109,6 +85,35 @@ function getObjeValue(obj, objName, paramsStack) {
   });
 
   return langName;
+}
+
+/**
+ * 模板转换
+ * @param {string} template 带有 {param}格式的字符串 就是需要转换的模板
+ * @param {object} params 替换模板的参数
+ */
+function templateTranslate(template, params) {
+  const reg = /\{\{(.*?)\}\}/g;
+
+  const paramsList = template.match(reg);
+
+  if (paramsList) {
+    // eslint-disable-next-line no-useless-escape
+    const paramsKeyList = paramsList.map(v => v.replace(/[\{, \}]/g, ""));
+
+    if (Array.isArray(paramsKeyList)) {
+      paramsKeyList.forEach((paramsKey, paramsIndex) => {
+        if (_.has(params, paramsKey)) {
+          template = template.replace(
+            paramsList[paramsIndex],
+            params[paramsKey]
+          );
+        }
+      });
+    }
+  }
+
+  return template;
 }
 
 export { intlUtil };

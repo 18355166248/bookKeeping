@@ -50,15 +50,14 @@ function Lang() {
     //     num: "传入Num"
     //   })
     // );
-    // console.log(
-    //   commonLang.footer.left.leftTop("en_US", {
-    //     label: commonLang.label("en_US"),
-    //     num: commonLang.num("en_US")
-    //   })
-    // );
+    console.log(
+      commonLang.footer.left.leftTop("en_US", {
+        num: commonLang.num("en_US"),
+      })
+    );
 
-    console.log(commonLang.footer.left('zh_CN'))
-    console.log(commonLang.footer('en_US'))
+    // console.log(commonLang.footer.left.leftTop);
+    // console.log(commonLang.footer.left("en_US"));
     // console.log("1.", commonLang.footer);
 
     // console.log('2.', _.isEqual(commonLang.ok(), commonLangConfig.ok));

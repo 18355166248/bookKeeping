@@ -7,7 +7,7 @@ const intlUtil = {
    */
   params: {},
   proxy(langs) {
-    const proxyList = {};
+    let proxyList = {};
     const _this = this;
     Object.keys(langs).forEach(langKey => {
       const langValue = langs[langKey];
@@ -50,6 +50,21 @@ const intlUtil = {
           return receiver;
         }
       });
+    });
+
+    proxyList = new Proxy(proxyList, {
+      get(target, key, receiver) {
+        const keyName = Object.keys(_this.params).find(paramKey => {
+          if (paramKey === key) {
+            return paramKey;
+          }
+        });
+        if (keyName) {
+          _this.params[key] = [];
+        }
+
+        return target[key];
+      }
     });
 
     return proxyList;

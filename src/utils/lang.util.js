@@ -1,4 +1,4 @@
-import _ from "lodash";
+import _ from 'lodash';
 
 const intlUtil = {
   /**
@@ -7,10 +7,14 @@ const intlUtil = {
    */
   params: {},
   proxy(langs) {
+    if (!_.isPlainObject(langs)) {
+      throw new Error('The proxy initialization parameter must be an object');
+    }
+
     let proxyList = {};
     const _this = this;
     Object.keys(langs).forEach(langKey => {
-      const langValue = langs[langKey];
+      let langValue = langs[langKey];
       this.params[langKey] = [];
 
       proxyList[langKey] = new Proxy(() => [langValue, langKey], {
@@ -19,15 +23,16 @@ const intlUtil = {
           const langsList = targetValue[0];
           let langValue = getObjeValue(
             langsList,
-            "langsList",
-            _this.params[targetValue[1]]
+            'langsList',
+            _this.params[targetValue[1]],
+            targetValue[1]
           );
 
-          _this.params[targetValue[1]] = [];
-
           if (args[0]) {
-            if (typeof args[0] !== "string") {
-              throw new Error("调用函数第一个参数必须是字符串");
+            if (typeof args[0] !== 'string') {
+              throw new Error(
+                'The first parameter to call the function must be a string'
+              );
             }
 
             langValue = langValue[args[0]];
@@ -35,17 +40,38 @@ const intlUtil = {
 
           if (args[1]) {
             if (!_.isPlainObject(args[1])) {
-              throw new Error("调用函数第二个参数必须是对象");
+              throw new Error(
+                'The second parameter of the calling function must be an object'
+              );
             }
 
             langValue = templateTranslate(langValue, args[1]);
           }
 
+          const completeParamsStack = [
+            targetValue[1],
+            ..._this.params[targetValue[1]]
+          ];
+
+          if (!langValue) {
+            throw new Error('无此多语言配置：' + completeParamsStack.join('.'));
+          }
+
+          if (Object.keys(langValue).length === 0) {
+            throw new Error('无此多语言配置：' + completeParamsStack.join('.'));
+          }
+
+          _this.params[targetValue[1]] = [];
+
           return langValue;
         },
         get(target, key, receiver) {
           const targetValue = target();
-          _this.params[targetValue[1]].push(key);
+
+          // 判断只有是字符串才能缓存key值
+          if (typeof key === 'string') {
+            _this.params[targetValue[1]].push(key);
+          }
 
           return receiver;
         }
@@ -54,13 +80,17 @@ const intlUtil = {
 
     proxyList = new Proxy(proxyList, {
       get(target, key, receiver) {
-        const keyName = Object.keys(_this.params).find(paramKey => {
-          if (paramKey === key) {
-            return paramKey;
-          }
-        });
-        if (keyName) {
-          _this.params[key] = [];
+        const keyName = Object.keys(_this.params).find(
+          paramKey => paramKey === key
+        );
+
+        if (!keyName) {
+          throw new Error('无此多语言配置：' + key);
+        }
+
+        // 存在嵌套调用
+        if (keyName && _this.params[keyName].length > 0) {
+          throw new Error('不允许嵌套使用');
         }
 
         return target[key];
@@ -76,28 +106,22 @@ const intlUtil = {
  * @param {*} template
  * @param {*} params
  */
-function getObjeValue(obj, objName, paramsStack) {
+function getObjeValue(obj, objName, paramsStack, parentKey) {
   if (paramsStack.length === 0) {
     return obj;
   }
 
   const getValue = new Function(
     objName,
-    `return ${objName}.${paramsStack.join(".")}`
+    `return ${objName}.${paramsStack.join('.')}`
   );
 
   const langName = _.cloneDeep(getValue(obj));
 
   if (!langName && !_.isPlainObject(langName)) {
-    throw new Error("无此多语言配置：" + paramsStack.join("."));
+    const completeParamsStack = [parentKey, ...paramsStack];
+    throw new Error('无此多语言配置：' + completeParamsStack.join('.'));
   }
-
-  // 删除所有子集数据
-  Object.keys(langName).forEach(lang => {
-    if (_.isPlainObject(langName[lang])) {
-      delete langName[lang];
-    }
-  });
 
   return langName;
 }
@@ -114,7 +138,7 @@ function templateTranslate(template, params) {
 
   if (paramsList) {
     // eslint-disable-next-line no-useless-escape
-    const paramsKeyList = paramsList.map(v => v.replace(/[\{, \}]/g, ""));
+    const paramsKeyList = paramsList.map(v => v.replace(/[\{, \}]/g, ''));
 
     if (Array.isArray(paramsKeyList)) {
       paramsKeyList.forEach((paramsKey, paramsIndex) => {

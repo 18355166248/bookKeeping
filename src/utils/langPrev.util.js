@@ -1,9 +1,11 @@
-import _ from "lodash";
+import _ from 'lodash';
 
 const handler = {
-  set: function(obj, prop, value) {
+  set: function (obj, prop, value) {
     if (_.isFunction(obj[prop])) {
-      Object.keys(value).forEach(valueKey => {
+      Object
+      .keys(value)
+      .forEach(valueKey => {
         obj[prop][valueKey] = value[valueKey];
       });
     } else {
@@ -12,13 +14,13 @@ const handler = {
 
     return true;
   },
-  get: function(target, propKey) {
+  get: function (target, propKey) {
     if (_.isFunction(target[propKey])) {
       return target[propKey];
     }
 
     return target[propKey];
-  }
+  },
 };
 
 const intlUtil = {
@@ -28,12 +30,14 @@ const intlUtil = {
    */
   proxy(langs) {
     if (!_.isPlainObject(langs)) {
-      throw new Error("params of lang must be object");
+      throw new Error('params of lang must be object');
     }
 
     const langProxy = new Proxy({}, handler);
 
-    Object.keys(langs).forEach(langKey => {
+    Object
+    .keys(langs)
+    .forEach(langKey => {
       let langValue = langs[langKey];
 
       if (_.isFunction(langValue)) {
@@ -46,7 +50,7 @@ const intlUtil = {
         langProxy[langKey] = (language, params) => {
           if (language) {
             if (!_.isString(language)) {
-              throw new Error("params of language must be string");
+              throw new Error('params of language must be string');
             }
 
             if (langValue[language]) {
@@ -56,7 +60,7 @@ const intlUtil = {
 
               return langValue[language];
             } else {
-              throw new Error("无此多语言配置：" + langKey);
+              throw new Error('无此多语言配置：' + langKey);
             }
           }
 
@@ -74,14 +78,12 @@ const intlUtil = {
           langProxy[langKey] = childFuncObj;
         }
       } else {
-        throw new Error(
-          "The first parameter of proxy is not in the correct format, expect function or object"
-        );
+        throw new Error('The first parameter of proxy is not in the correct format, expect function or object');
       }
     });
 
     return langProxy;
-  }
+  },
 };
 
 /**
@@ -96,15 +98,13 @@ function templateTranslate(template, params) {
 
   if (paramsList) {
     // eslint-disable-next-line no-useless-escape
-    const paramsKeyList = paramsList.map(v => v.replace(/[\{, \}]/g, ""));
+    const paramsKeyList = paramsList.map(v => v.replace(/[\{, \}]/g, ''));
 
     if (Array.isArray(paramsKeyList)) {
-      paramsKeyList.forEach((paramsKey, paramsIndex) => {
+      paramsKeyList
+      .forEach((paramsKey, paramsIndex) => {
         if (_.has(params, paramsKey)) {
-          template = template.replace(
-            paramsList[paramsIndex],
-            params[paramsKey]
-          );
+          template = template.replace(paramsList[paramsIndex], params[paramsKey]);
         }
       });
     }

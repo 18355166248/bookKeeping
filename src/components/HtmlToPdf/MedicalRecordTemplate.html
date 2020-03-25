@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>JIAHUI HEALTH</title>
+
+    <style>
+        @page {
+            size: 210mm 297mm;
+            margin: 0;
+        }
+        body {
+            font-family: SimSun;
+        }
+        table td {
+            background: #fff;
+            padding: 6px 4px;
+            font-size: 14px;
+        }
+
+        .mb-6 {
+            margin-bottom: 6px;
+        }
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .pl-32 {
+            padding-left: 32px;
+        }
+
+        .fw-500 {
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 0 40px 60px 40px;
+        }
+
+        .header {
+            display: inline-block;
+            width: 100%;
+            margin-top: 60px;
+            margin-bottom: 40px;
+        }
+        .header .logo {
+            padding-right: 45px;
+            box-sizing: border-box;
+            width: 290px;
+            vertical-align: top;
+            float: left;
+        }
+        .header .table {
+            margin-left: 290px;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        .content .hospital {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .content .hospital h3:first-child {
+            margin-top: 0;
+            margin-bottom: 40px;
+        }
+
+        .tableInfo table td {
+            font-size: 16px;
+        }
+
+        .pastMedicalHistory > div {
+            margin-bottom: 6px;
+        }
+
+        .tableInfo table td > div {
+            margin-bottom: 6px;
+        }
+
+        .tableInfo table td > div:last-child {
+            margin-bottom: 0;
+        }
+
+        /* footer */
+        .footer {
+            margin-top: 40px;
+        }
+        .footer > div {
+            margin-bottom: 6px;
+        }
+        .footer .footerPage {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 30px;
+            line-height: 30px;
+        }
+
+        .pageNext{page-break-after: always;}
+
+    </style>
+</head>
+<body>
+<div class="content">
+    <!-- header start -->
+    <div class="header">
+        <div class="logo"><img style="width: 98%" th:src="${jiahui_logo}" type=""/></div>
+        <div class="table">
+            <table width="100%" border="1px solid #ccc" cellspacing="0" cellpadding="0">
+            <tr>
+                <td width="50%">MRN</td>
+                <td width="50%" th:text="${patient.mrn}"></td>
+            </tr>
+            <tr>
+                <td>患者姓名 Patient Name</td>
+                <td>
+                    <span th:if="${patient.name.zh_CN} != null">
+                        <span th:text="${patient.name.zh_CN}"></span>
+                    </span>
+                    <span th:if="${patient.name.en_US} != null">
+                        <span th:text="${patient.name.en_US}"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>性别/出生日期/年龄 Gender/DOB/Age</td>
+                <td>
+                    <span th:if="${patient.gender.zh_CN} != null">
+                        <span th:text="${patient.gender.zh_CN} + '/'"></span>
+                    </span>
+                    <span th:if="${patient.birthday.zh_CN} != null">
+                        <span th:text="${patient.birthday.zh_CN} + '/'"></span>
+                    </span>
+                    <span th:if="${patient.age} != null">
+                        <span th:text="${patient.age}"></span>
+                    </span>
+                    <span th:if="${patient.gender.en_US} != null">
+                        <span th:text="${patient.gender.en_US} + '/'"></span>
+                    </span>
+                    <span th:if="${patient.birthday.en_US} != null">
+                        <span th:text="${patient.birthday.en_US} + '/'"></span>
+                    </span>
+                    <span th:if="${patient.age} != null">
+                        <span th:text="${patient.age}"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>院区/专科 Campus/Specialty</td>
+                <td th:text="${deptInfo.campus.zh_CN} + '(' + ${deptInfo.campus.en_US} +')  '+ ${deptInfo.specialty.zh_CN} + '(' +${deptInfo.specialty.en_US} +') '"/>
+            </tr>
+        </table>
+        </div>
+    </div>
+
+    <!-- header end -->
+
+    <div class="hospital">
+        <h3>上海嘉会国际医院</h3>
+        <h3>Jiahui International Hospital(Shanghai)</h3>
+        <h3>门诊病历摘要 Outpatient Medical Record</h3>
+    </div>
+
+    <div class="tableInfo">
+        <table width="100%" border="1px solid #ccc" cellspacing="0" cellpadding="0">
+            <tr class="pdf-page-range">
+                <td width="50%">
+                    <span class="fw-500">就诊日期</span>
+                    Consultation date：<span th:text="${registerDate}"></span>
+                </td>
+                <td width="50%">
+                    <span class="fw-500">主诊医师</span>
+                    Attending physician：
+                    <span th:if="${doctor.zh_CN} != null">
+                        <span th:text="${doctor.zh_CN} + ' '"></span>
+                    </span>
+                    <span th:if="${doctor.en_US} != null">
+                        <span th:text="${doctor.en_US}"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td width="50%">
+                    <span class="fw-500">就诊机构</span>
+                    <span th:text="${deptInfo.medicalInstitution.zh_CN} + '(' + ${deptInfo.medicalInstitution.en_US} +')  '">就诊机构</span>
+                </td>
+                <td width="50%">
+                    <span class="fw-500">专科</span>
+                    <span th:text="${deptInfo.specialty.zh_CN} + '(' + ${deptInfo.specialty.en_US} +')  '">就诊机构</span>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div>
+                        <div><span class="fw-500">药物过敏</span> Allergies：</div>
+                        <div>
+                        <span th:each="patientAllergyRecord : ${patientAllergyRecordList}">
+                            <div th:if="${patientAllergyRecord.allergyType} == 1">
+                                <div>
+                                    <span>过敏药品:</span>
+                                    <span th:if="${patientAllergyRecord.allergySourceName} != null">
+                                        <span th:text="${patientAllergyRecord.allergySourceName}"></span>
+                                    </span>
+                                    <span th:if="${patientAllergyRecord.allergyReactionName} != null and ${patientAllergyRecord.allergyReactionName} != ''">
+                                        <span th:text="'过敏反应:'+${patientAllergyRecord.allergyReactionName}"></span>
+                                    </span>
+                                    <span th:if="${patientAllergyRecord.allergyDegreeName} != null and ${patientAllergyRecord.allergyDegreeName} != ''">
+                                        <span th:text="'严重级别:'+${patientAllergyRecord.allergyDegreeName}"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div th:if="${patientAllergyRecord.allergyType} != 1">
+                                <div>
+                                    <span>过敏原:</span>
+                                    <span th:if="${patientAllergyRecord.allergySourceName} != null">
+                                        <span th:text="${patientAllergyRecord.allergySourceName}"></span>
+                                    </span>
+                                    <span th:if="${patientAllergyRecord.allergyReactionName} != null and ${patientAllergyRecord.allergyReactionName} != ''">
+                                        <span th:text="'过敏反应:'+${patientAllergyRecord.allergyReactionName}"></span>
+                                    </span>
+                                    <span th:if="${patientAllergyRecord.allergyDegreeName} != null and ${patientAllergyRecord.allergyDegreeName} != ''">
+                                        <span th:text="'严重级别:'+${patientAllergyRecord.allergyDegreeName}"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div><span class="fw-500">主诉</span> Chief Complaint:</div>
+                    <div th:if="${medicalHistory.mainComplaint} != null">
+                        <div th:text="${medicalHistory.mainComplaint}"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div><span class="fw-500">现病史</span> History of Present Illness:</div>
+                    <div th:if="${medicalHistory.presentIllnessHistory} != null">
+                        <div th:text="${medicalHistory.presentIllnessHistory}"></div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div>
+                        <span class="fw-500">既往史</span> Past medical history:
+                    </div>
+                    <div class="pl-32 pastMedicalHistory">
+
+                        <div th:if="${medicalHistory.pastIllnessHistoryDiseaseFlag}">
+                            <div>
+                                <span class="fw-500">疾病史 Past diseases：</span>
+                            </div>
+                            <div class="pl-32"
+                                 th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryDiseaseList}">
+                                <div>
+                                    <span th:if="${pastIllnessHistory.diseaseName} != null">
+                                        <span th:text="${pastIllnessHistory.diseaseName} + ' '"> : </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.diseaseStart} != null and ${pastIllnessHistory.diseaseStart} != ''">
+                                        <span th:text="${pastIllnessHistory.diseaseStart} + ' ~ '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.diseaseEnd} != null">
+                                        <span th:text="${pastIllnessHistory.diseaseEnd} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.treatment} != null">
+                                      <span th:text="${pastIllnessHistory.treatment} + ' '"> : </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                      <span th:text="${pastIllnessHistory.remark} + ' '"> : </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${medicalHistory.historySocialHabitsFlag}">
+                            <div>
+                                <span class="fw-500">社会习惯史 Personal history :</span>
+                            </div>
+
+                            <div th:if="${medicalHistory.pastIllnessHistorySmokeFlag}">
+                                <div>
+                                    <span class="fw-500">吸烟史 Cigarette :</span>
+                                </div>
+                                <div class="pl-32"
+                                     th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistorySmokeList}">
+                                    <span th:if="${pastIllnessHistory.isSmoke} eq '0'">
+                                        <span> 否 no </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.isSmoke} eq '2'">
+                                        <span> 已戒 Quitted </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.isSmoke} eq '1'">
+                                        <span>
+                                            <span> 是 yes </span>
+                                        </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.amount} != null and ${pastIllnessHistory.amount} != ''">
+                                                <span th:text="${pastIllnessHistory.amount} +' '+ ${pastIllnessHistory.unit}+'/天 Day '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.sTime} != null and ${pastIllnessHistory.sTime} != ''">
+                                                <span th:text="${pastIllnessHistory.sTime} + ' ~ ' "></span>
+                                            </span>
+                                    <span th:if="${pastIllnessHistory.eTime} != null">
+                                                <span th:text="${pastIllnessHistory.eTime}+' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                                <span th:text="${pastIllnessHistory.remark}+' '"></span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div th:if="${medicalHistory.pastIllnessHistoryDrinkFlag}">
+                                <div>
+                                    <span class="fw-500">饮酒史 Alcohol :</span>
+                                </div>
+                                <div class="pl-32"
+                                     th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryDrinkList}">
+                                    <span th:if="${pastIllnessHistory.isDrink} eq '0'">
+                                        <span> 否 no </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.isDrink} eq '2'">
+                                        <span> 已戒 Quitted </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.isDrink} eq '1'">
+                                        <div>
+                                            <span> 是 yes  </span>
+                                        </div>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.amount} != null and ${pastIllnessHistory.amount} != ''">
+                                         <span th:text="${pastIllnessHistory.amount} + 'ml/天 Day '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.sTime} != null and ${pastIllnessHistory.sTime} != ''">
+                                        <span th:text="${pastIllnessHistory.sTime} + ' ~ '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.eTime} != null">
+                                        <span th:text="${pastIllnessHistory.eTime}+' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                        <span th:text="${pastIllnessHistory.remark}+' '"></span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div th:if="${medicalHistory.pastIllnessHistorySportFlag}">
+                                <div>
+                                    <span class="fw-500">运动史 Exercises :</span>
+                                </div>
+                                <div class="pl-32"
+                                     th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistorySportList}">
+                                    <span th:if="${pastIllnessHistory.times} eq '0'">
+                                        <span>不运动 </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.times} eq '1'">
+                                        <span>经常运动 </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.times} eq '2'">
+                                        <span>曾静运动现已停止 </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                        <span th:text="${pastIllnessHistory.remark}+' '"></span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div th:if="${medicalHistory.pastIllnessHistoryTravelFlag}">
+                                <div>
+                                    <span class="fw-500">近期旅行史 Recennt travel :</span>
+                                </div>
+                                <div class="pl-32"
+                                     th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryTravelList}">
+                                    <div th:if="${pastIllnessHistory.remark} != null">
+                                        <span th:text="${pastIllnessHistory.remark} + ' '"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div th:if="${medicalHistory.pastIllnessHistoryWorkFlag}">
+                                <div>
+                                    <span class="fw-500">职业史 Occupation :</span>
+                                </div>
+                                <div class="pl-32"
+                                     th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryWorkList}">
+                                    <span th:if="${pastIllnessHistory.work} != null">
+                                        <span th:text="${pastIllnessHistory.work} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.year} != null">
+                                        <span th:text="${pastIllnessHistory.year} + 'Y '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.month} != null">
+                                        <span th:text="${pastIllnessHistory.month} +'M '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                        <span th:text="${pastIllnessHistory.remark}"></span>
+                                    </span>
+                                    <br/>
+                                </div>
+                            </div>
+
+                            <div th:if="${medicalHistory.pastIllnessHistoryOtherFlag}">
+                                <div>
+                                    <span class="fw-500">其他 Others :</span>
+                                </div>
+                                <div class="pl-32"
+                                     th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryOtherList}">
+                                    <span th:text="${pastIllnessHistory.remark}"></span><br/>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div th:if="${medicalHistory.pastIllnessHistoryFamilyFlag}">
+                            <div>
+                                <span class="fw-500">家族史 Family history:</span>
+                            </div>
+                            <div class="pl-32" th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryFamilyList}">
+                                <div>
+                                    <span th:if="${pastIllnessHistory.relationNameChn} != null">
+                                        <span th:text="${pastIllnessHistory.relationNameChn} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.relationNameEng} != null">
+                                        <span th:text="${pastIllnessHistory.relationNameEng} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.diseaseName} != null">
+                                        <span th:text="${pastIllnessHistory.diseaseName} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                        <span th:text="${pastIllnessHistory.remark} + ' '"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${medicalHistory.pastIllnessHistoryOperationFlag}">
+                            <div>
+                                <span class="fw-500">手术外伤史 Surgery Trauma:</span>
+                            </div>
+                            <div class="pl-32" th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryOperationList}">
+                                <div>
+                                    <span th:if="${pastIllnessHistory.operationName} != null">
+                                        <span th:text="${pastIllnessHistory.operationName} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.operationDate} != null">
+                                        <span th:text="${pastIllnessHistory.operationDate} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.operationExplain} != null">
+                                        <span th:text="${pastIllnessHistory.operationExplain} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                        <span th:text="${pastIllnessHistory.remark} + ' '"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${medicalHistory.pastIllnessHistoryBloodFlag}">
+                            <div>
+                                <span class="fw-500">输血史 Transfusion:</span>
+                            </div>
+                            <div class="pl-32"
+                                 th:each="pastIllnessHistory:${medicalHistory.pastIllnessHistoryBloodList}">
+                                <div>
+                                    <span th:if="${pastIllnessHistory.bloodTypeName} != null">
+                                        <span th:text="${pastIllnessHistory.bloodTypeName} + ' ' "></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.bloodDate} != null">
+                                        <span th:text="${pastIllnessHistory.bloodDate} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.amount} != null">
+                                        <span th:text="${pastIllnessHistory.amount} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.hasEffect} eq '0'">
+                                        <span> 无 no 输血反应TR </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.hasEffect} eq '1'">
+                                        <span> 有 yes 输血反应TR </span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.effect} != null">
+                                        <span th:text="${pastIllnessHistory.effect} + ' '"></span>
+                                    </span>
+                                    <span th:if="${pastIllnessHistory.remark} != null">
+                                        <span th:text="${pastIllnessHistory.remark} + ' '"></span>
+                                    </span>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    <div>
+                        <div>
+                            <span class="fw-500">口腔专科既往史</span> Past Medical history of stomatology:
+                        </div>
+                        <div th:if="${medicalHistory.dentalPastHistory} != null">
+                            <div th:text="${medicalHistory.dentalPastHistory}"></div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div>
+                        <div>
+                            <span class="fw-500">检查</span> Physical checkup:
+                            <div th:each="diagnosisMedicalRecordCheckNormal:${medicalHistory.diagnosisMedicalRecordCheckNormalList}">
+                                <div>
+                                    <span th:if="${diagnosisMedicalRecordCheckNormal.diagnosisPosition} != null">
+                                        <span th:text="${diagnosisMedicalRecordCheckNormal.diagnosisPosition}"></span>
+                                    </span>
+                                    <span th:if="${diagnosisMedicalRecordCheckNormal.checkNormalSymptoms} != null">
+                                        <span th:text="${diagnosisMedicalRecordCheckNormal.checkNormalSymptoms} + ','"></span>
+                                    </span>
+                                    <span th:if="${diagnosisMedicalRecordCheckNormal.checkNormalResult} != null">
+                                        <span th:text="${diagnosisMedicalRecordCheckNormal.checkNormalResult}"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="fw-500">生命体征</span> Vital signs:
+                        <div th:if="${medicalHistory.vitalSigns} != null">
+                            <div th:text="${medicalHistory.vitalSigns}"></div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div>
+                        <span class="fw-500">辅助检查</span> Auxiliary examinations:
+                    </div>
+                    <div th:each="diagnosisMedicalRecordCheckRay : ${medicalHistory.diagnosisMedicalRecordCheckRayList}">
+                        <span th:if="${diagnosisMedicalRecordCheckRay.diagnosisPosition} != null">
+                            <span th:text="${diagnosisMedicalRecordCheckRay.diagnosisPosition}"></span>
+                        </span>
+                        <span th:if="${diagnosisMedicalRecordCheckRay.checkRaySymptoms} != null">
+                            <span th:text="${diagnosisMedicalRecordCheckRay.checkRaySymptoms}"></span>
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div><span class="fw-500">诊断</span> Diagnosis:</div>
+                    <div th:each="diagnosisMedicalRecordDiagnosis : ${medicalHistory.diagnosisMedicalRecordDiagnosisList}">
+                        <span th:if="${diagnosisMedicalRecordDiagnosis.diagnosisPosition} != null">
+                            <span th:text="${diagnosisMedicalRecordDiagnosis.diagnosisPosition}"></span>
+                        </span>
+                        <span th:if="${diagnosisMedicalRecordDiagnosis.diagnosisDesc} != null">
+                            <span th:text="${diagnosisMedicalRecordDiagnosis.diagnosisDesc}"></span>
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div><span class="fw-500">治疗计划</span> Treatment plan :
+                        <div th:each="diagnosisTreatmentPlan : ${diagnosisTreatmentPlanList}">
+                            <div th:if="${diagnosisTreatmentPlan.diagnosisTreatmentPlanName} != null">
+                                <div th:text="${diagnosisTreatmentPlan.diagnosisTreatmentPlanName}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div><span class="fw-500">处置</span> Processing :</div>
+                    <div th:each="diagnosisMedicalRecordDispose : ${medicalHistory.diagnosisMedicalRecordDisposeList}">
+                        <span th:if="${diagnosisMedicalRecordDispose.diagnosisPosition} != null">
+                            <span th:text="${diagnosisMedicalRecordDispose.diagnosisPosition}"></span>
+                        </span>
+                        <span th:if="${diagnosisMedicalRecordDispose.dispose} != null">
+                            <span th:text="${diagnosisMedicalRecordDispose.dispose}"></span>
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div><span class="fw-500">医嘱</span> Doctor's order :</div>
+                    <div th:each="doctorAdvice,doctorAdviceStat : ${medicalHistory.doctorAdviceList}">
+                        <div th:if="${doctorAdvice.itemType} == 3">
+                            <div>
+                                <span class="fw-500" th:text="${doctorAdviceStat.index} + 1"> ：</span>
+                                <span th:text="${doctorAdvice.itemName.zh_CN} + '，'"></span>
+                                <span th:if="${doctorAdvice.everyDayDose} != null">
+                                <span th:text="'每次量 '+${doctorAdvice.everyDayDose} + ${doctorAdvice.doseUnit} + '，'"></span>
+                              </span>
+                                <span th:if="${doctorAdvice.total} != null">
+                                <span th:text="'总量 '+${doctorAdvice.total} + ${doctorAdvice.unit} + '，'"></span>
+                              </span>
+                                <span th:if="${doctorAdvice.usageName} != null">
+                                <span th:text="${doctorAdvice.usageName.zh_CN} + '，'"></span>
+                              </span>
+                                <span th:if="${doctorAdvice.frequencyName} != null">
+                                <span th:text="${doctorAdvice.frequencyName.zh_CN}"></span>
+                              </span>
+                            </div>
+                            <div>
+                                <span th:text="${doctorAdvice.itemName.en_US} + '，'"></span>
+                                <span th:if="${doctorAdvice.everyDayDose} != null">
+                                <span th:text="'Dose '+${doctorAdvice.everyDayDose} + ${doctorAdvice.doseUnit} + '，'"></span>
+                              </span>
+                                <span th:if="${doctorAdvice.total} != null">
+                                <span th:text="'Total '+${doctorAdvice.total} + ${doctorAdvice.unit}+ '，'"></span>
+                              </span>
+                                <span th:if="${doctorAdvice.usageName} != null">
+                                <span th:text="${doctorAdvice.usageName.en_US}+ '，'"></span>
+                              </span>
+                                <span th:if="${doctorAdvice.frequencyName} != null">
+                                <span th:text="${doctorAdvice.frequencyName.en_US}"></span>
+                              </span>
+                            </div>
+                        </div>
+                        <div th:if="${doctorAdvice.itemType} == 4">
+                            <span class="fw-500" th:text="${doctorAdviceStat.index} + 1"> ：</span>
+                            <span th:text="${doctorAdvice.itemName.zh_CN} + ',' + ${doctorAdvice.itemName.en_US}"></span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pdf-page-range">
+                <td colspan="2">
+                    <div>
+                        <span class="fw-500">医师姓名</span> Physician's name :
+                        <span th:text="${doctor.zh_CN}"></span>
+                        <span th:text="${doctor.en_US}"></span>
+                    </div>
+                    <div>
+                        <span class="fw-500">医师签名</span> Physician's signature :
+                        <span th:text="${doctor.zh_CN}"></span>
+                        <span th:text="${doctor.en_US}"></span>
+                    </div>
+                    <div>
+                        <span class="fw-500">日期</span> Date :
+                        <span th:text="${createFileTime}"></span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- footer -->
+    <div class="footer">
+        <div>
+            <span class="fw-500">上海嘉会国际医院</span> Jiahui International Hospital (Shanghai)
+        </div>
+        <div class="fw-500">上海市徐汇区桂平路 689 号</div>
+        <div>689 Guiping Road, Xuhui District, Shanghai</div>
+    </div>
+</div>
+
+<script th:inline="javascript" type="text/javascript">
+    window.onload = function () {
+        var page = 1;
+        pdfPageRange();
+
+        // 在这里赋值total
+        $('.footer').each(function (i) {
+            var $this = $(this);
+            $this.find('.footerPage>span:nth-child(2)').text(i + 1).next().next().text(page);
+        })
+
+        function pdfPageRange(tableDom) {
+            var heigth = $($('.footer')[0]).height() + 30;
+            var pdfPageRangeList;
+
+            if (tableDom) {
+                pdfPageRangeList = tableDom.children('.pdf-page-range')
+            } else {
+                pdfPageRangeList = $(".pdf-page-range")
+            }
+
+            pdfPageRangeList.each(function () {
+                var $this = $(this);
+                var $next = $this.next();
+                var $prevPage = $this.prev('.pageNext');
+
+                heigth += $this[0].offsetHeight;
+                if (heigth > 1000) {
+                    var prevTable = $this.parent('tbody').parent('table');
+                    $($('.header')[0]).clone().insertAfter(prevTable);
+                    prevTable.after("<div class='pageNext'></div>");
+                    var cloneFooter = $($('.footer')[0]).clone();
+                    prevTable.after(cloneFooter);
+                    heigth = $this[0].offsetHeight;
+
+                    var nextAll = $this.nextAll().clone();
+                    $this.nextAll().remove();
+
+                    var tableDom = $('<table width="100%" border="1px solid #ccc" cellspacing="0" cellpadding="0"></table>');
+                    tableDom.append(nextAll);
+
+                    $('.header').last().after(tableDom);
+
+                    page++;
+                    pdfPageRange(tableDom);
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

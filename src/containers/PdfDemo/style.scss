@@ -1,0 +1,82 @@
+table td {
+  background: #fff;
+  padding: 6px 4px;
+  font-size: 14px;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.mb-6 {
+  margin-bottom: 6px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.pl-32 {
+  padding-left: 32px;
+}
+
+.fw-500 {
+  font-weight: 500;
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  padding: 20px 0;
+}
+.header .logo {
+  padding-right: 10px;
+  box-sizing: border-box;
+  width: 180px;
+}
+.header .logo img {
+  width: 100%;
+}
+.header .table {
+  flex: 1;
+  box-sizing: border-box;
+  border-collapse: collapse;
+}
+
+.hospital {
+  text-align: center;
+  padding-bottom: 30px;
+}
+
+.hospital h3:first-child {
+  margin-top: 0;
+  padding-bottom: 20px;
+}
+
+.tableInfo table td {
+  font-size: 16px;
+}
+
+.pastMedicalHistory > div {
+  margin-bottom: 6px;
+}
+
+.tableInfo table td > div {
+  margin-bottom: 6px;
+}
+
+.tableInfo table td > div:last-child {
+  margin-bottom: 0;
+}
+
+/* footer */
+.footer {
+  // padding-top: 40px;
+}
+.footer > div {
+  margin-bottom: 6px;
+}
+.footer .footerPage {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  height: 30px;
+  line-height: 30px;
+}

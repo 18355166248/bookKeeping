@@ -1,20 +1,21 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.scss";
-import App from "./App";
-import * as serviceWorker from "./serviceWorker";
-import { createStore, applyMiddleware } from "redux";
-import { Provider } from "react-redux";
-import thunk from "redux-thunk";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import InitRoute from "components/InitRoute/InitRoute";
-import Create from "components/Create";
-import FormDemo from "components/Form/Form";
-import FormDemo22 from "components/Form/FormDemo";
-import Lang from "components/Lang/Lang";
-import TableCell from "components/TableCell/TableCell";
-import reducer from "./redux";
-import { data } from "components/Form/data";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.scss';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import InitRoute from 'components/InitRoute/InitRoute';
+import Create from 'components/Create';
+import FormDemo from 'components/Form/Form';
+import FormDemo22 from 'components/Form/FormDemo';
+import Lang from 'components/Lang/Lang';
+import TableCell from 'components/TableCell/TableCell';
+import reducer from './redux';
+import { data } from 'components/Form/data';
+import PdfDemo from './containers/PdfDemo/PdfDemo';
 
 const store = createStore(reducer, applyMiddleware(thunk));
 
@@ -34,13 +35,16 @@ ReactDOM.render(
             <Lang />
           </Route>
           <Route path="/tableCell" exact>
-          <TableCell />
+            <TableCell />
+          </Route>
+          <Route path="/pdf">
+            <PdfDemo />
           </Route>
         </Switch>
       </div>
     </Router>
   </Provider>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

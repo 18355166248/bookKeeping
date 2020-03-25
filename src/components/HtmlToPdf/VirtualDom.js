@@ -21,7 +21,7 @@ function VirtualDom(props) {
       style={{
         width: width + 'px',
         padding: padding + 'px',
-        position: 'absolute',
+        position: 'fixed',
         left: 0,
         top: 0,
         zIndex: 1,

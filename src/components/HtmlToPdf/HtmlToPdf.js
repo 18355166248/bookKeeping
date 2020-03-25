@@ -5,7 +5,7 @@ import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-function HtmlToPdf(props) {
+function HtmlToPdf (props) {
   const {
     Head,
     Foot,
@@ -49,15 +49,11 @@ function HtmlToPdf(props) {
         if (curOffsetTop >= (height - (headHeight + footHeight)) * total) {
           total++;
           // 换页
-          curContentList.push(
-            curOffsetTop -
-              pdfPageRangeList[pdfPageRangeIndex - 1].offsetHeight -
-              2
-          );
+          console.log(pdfPageRangeList[pdfPageRangeIndex - 1].getBoundingClientRect().top - bodyOffsetTop)
+          curContentList.push(pdfPageRangeList[pdfPageRangeIndex - 1].getBoundingClientRect().top - bodyOffsetTop);
         }
       });
 
-      console.log(curContentList);
 
       // 生成头部, 底部图片
       setTimeout(() => {
@@ -74,7 +70,6 @@ function HtmlToPdf(props) {
           var imgHeight = (width / contentWidth) * contentHeight;
 
           var pageData = canvas.toDataURL('image/jpeg', 1.0);
-          // console.log(pageData);
           setHeadImg({ data: pageData, width: imgWidth, height: imgHeight });
         });
 
@@ -91,14 +86,13 @@ function HtmlToPdf(props) {
           var imgHeight = (width / contentWidth) * contentHeight;
 
           var pageData = canvas.toDataURL('image/jpeg', 1.0);
-          // console.log(pageData);
           setFootImg({ data: pageData, width: imgWidth, height: imgHeight });
         });
       }, 100);
 
       setContentList(curContentList);
     }
-  }, [domInfo]);
+  }, [domInfo, height, width]);
 
   // 监听contentList
   useEffect(() => {
@@ -106,7 +100,7 @@ function HtmlToPdf(props) {
       renderFinish();
       getPDF();
     }
-  }, [contentList, headImg, footImg]);
+  }, [contentList, headImg, footImg, renderFinish, getPDF]);
 
   return (
     <div ref={htmlContent} style={{ width: width + 'px' }}>
@@ -135,7 +129,7 @@ function HtmlToPdf(props) {
     </div>
   );
 
-  function getPDF() {
+  function getPDF () {
     console.log(domInfo.contentRef);
     html2canvas(domInfo.contentRef, {
       scale: 2,
@@ -164,10 +158,10 @@ function HtmlToPdf(props) {
         const imgContent = new Image();
         const imgFoot = new Image();
 
-        imgHead.onload = function() {
+        imgHead.onload = function () {
           imagBox.appendChild(imgHead);
 
-          imgContent.onload = function() {
+          imgContent.onload = function () {
             const contentBox = document.createElement('div');
             contentBox.style.width = '100%';
             contentBox.style.backgroundColor = '#fff';
@@ -191,7 +185,7 @@ function HtmlToPdf(props) {
             imgContent.style.top = -content + 'px';
             imagBox.appendChild(contentBox);
 
-            imgFoot.onload = function() {
+            imgFoot.onload = function () {
               imagBox.appendChild(imgFoot);
 
               document.body.appendChild(imagBox);

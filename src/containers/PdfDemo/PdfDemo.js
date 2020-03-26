@@ -114,11 +114,6 @@ function PdfDemo() {
         <div className="fw-500">上海市徐汇区桂平路 689 号</div>
         <div>689 Guiping Road, Xuhui District, Shanghai</div>
       </div>
-      <div style={{ textAlign: 'center' }}>
-        <span>{props.curpage}</span>
-        <span>/</span>
-        <span>{props.total}</span>
-      </div>
     </div>
   ));
 

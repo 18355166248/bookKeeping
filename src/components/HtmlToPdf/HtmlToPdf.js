@@ -5,7 +5,7 @@ import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-function HtmlToPdf (props) {
+function HtmlToPdf(props) {
   const {
     Head,
     Foot,
@@ -25,6 +25,7 @@ function HtmlToPdf (props) {
   const [headImg, setHeadImg] = useState('');
   const [footImg, setFootImg] = useState('');
   const htmlContent = useRef(null);
+  const pageHeight = 40;
 
   // 获取 Head, Foot, Content 高度
   useEffect(() => {
@@ -33,7 +34,7 @@ function HtmlToPdf (props) {
       const headHeight = headRef.offsetHeight;
       const footHeight = footRef.offsetHeight;
       const curContentList = [0];
-      let total = 1;
+      const headerWithFootHeight = headHeight + footHeight + pageHeight;
       setHeadHeight(headHeight);
       setFootHeight(footHeight);
 
@@ -46,14 +47,20 @@ function HtmlToPdf (props) {
         const curOffsetTop =
           pdfPageRange.getBoundingClientRect().top - bodyOffsetTop;
 
-        if (curOffsetTop >= (height - (headHeight + footHeight)) * total) {
-          total++;
+        // 这里表示的是排除公共区域, 截取位置所在的高度 dom超过这个高度那就应该要换页
+        const curHeightTotal =
+          height -
+          headerWithFootHeight +
+          curContentList[curContentList.length - 1];
+
+        if (curOffsetTop >= curHeightTotal) {
           // 换页
-          console.log(pdfPageRangeList[pdfPageRangeIndex - 1].getBoundingClientRect().top - bodyOffsetTop)
-          curContentList.push(pdfPageRangeList[pdfPageRangeIndex - 1].getBoundingClientRect().top - bodyOffsetTop);
+          curContentList.push(
+            pdfPageRangeList[pdfPageRangeIndex - 1].getBoundingClientRect()
+              .top - bodyOffsetTop
+          );
         }
       });
-
 
       // 生成头部, 底部图片
       setTimeout(() => {
@@ -129,8 +136,7 @@ function HtmlToPdf (props) {
     </div>
   );
 
-  function getPDF () {
-    console.log(domInfo.contentRef);
+  function getPDF() {
     html2canvas(domInfo.contentRef, {
       scale: 2,
       height: domInfo.contentRef.offsetHeight, // 下面解决当页面滚动之后生成图片出现白边问题
@@ -138,13 +144,12 @@ function HtmlToPdf (props) {
     }).then(canvas => {
       var contentWidth = canvas.width;
       var contentHeight = canvas.height;
+      const headerWithFootHeight = headHeight + footHeight + pageHeight; //头部+尾部+页码高度
 
       //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
       var imgWidth = width;
       var imgHeight = (width / contentWidth) * contentHeight;
-
       var pageData = canvas.toDataURL('image/jpeg', 1.0);
-
       var pdf = new jsPDF('', 'pt');
 
       contentList.forEach((content, contentIndex) => {
@@ -153,24 +158,29 @@ function HtmlToPdf (props) {
         imagBox.style.height = height + 'px';
         imagBox.style.paddingLeft = padding + 'px';
         imagBox.style.paddingRight = padding + 'px';
+        imagBox.style.backgroundColor = '#fff';
         imagBox.innerHTML = '';
         const imgHead = new Image();
         const imgContent = new Image();
         const imgFoot = new Image();
 
-        imgHead.onload = function () {
+        // 头部图片渲染完成
+        imgHead.onload = function() {
           imagBox.appendChild(imgHead);
 
-          imgContent.onload = function () {
+          // 中间主题图片渲染完成
+          imgContent.onload = function() {
             const contentBox = document.createElement('div');
             contentBox.style.width = '100%';
-            contentBox.style.backgroundColor = '#fff';
-            contentBox.style.height = height - headHeight - footHeight + 'px';
+
+            contentBox.style.height = height - headerWithFootHeight + 'px';
             const contentBoxChild = document.createElement('div');
             contentBoxChild.style.width = '100%';
             contentBoxChild.style.position = 'relative';
+
             const diffNum =
-              (height - headHeight - footHeight) * (contentIndex + 1) -
+              content +
+              (height - headerWithFootHeight) -
               contentList[contentIndex + 1];
             if (diffNum > 0) {
               contentBox.style.paddingBottom = diffNum + 'px';
@@ -185,9 +195,32 @@ function HtmlToPdf (props) {
             imgContent.style.top = -content + 'px';
             imagBox.appendChild(contentBox);
 
-            imgFoot.onload = function () {
+            // 底部图片渲染完成
+            imgFoot.onload = function() {
               imagBox.appendChild(imgFoot);
 
+              const pageBox = document.createElement('div');
+              const pageTextDom = document.createElement('span');
+              const curPageDom = document.createElement('span');
+              const splitLineDom = document.createElement('span');
+              const totalPageDom = document.createElement('span');
+              pageTextDom.innerText = 'Page ';
+              curPageDom.innerText = contentIndex + 1;
+              splitLineDom.innerText = '/';
+              totalPageDom.innerText = contentList.length;
+
+              pageBox.style.height = pageHeight + 'px';
+              pageBox.style.lineHeight = pageHeight + 'px';
+              pageBox.style.textAlign = 'center';
+              pageBox.style.fontWeight = '700';
+
+              pageBox.appendChild(pageTextDom);
+              pageBox.appendChild(curPageDom);
+              pageBox.appendChild(splitLineDom);
+              pageBox.appendChild(totalPageDom);
+
+              imagBox.appendChild(pageBox);
+              // 添加底部page/total
               document.body.appendChild(imagBox);
             };
           };

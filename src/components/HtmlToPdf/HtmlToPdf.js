@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import HtmlToPdfPage from './HtmlToPdfPage';
 import VirtualDom from './VirtualDom';
 import _ from 'lodash';
 import html2canvas from 'html2canvas';
@@ -16,6 +15,7 @@ function HtmlToPdf(props) {
     renderFinish,
     finish,
     preview = false,
+    fileName,
     setGetPdfCallback
   } = props;
   const [domInfo, setDomInfo] = useState(null);
@@ -26,6 +26,7 @@ function HtmlToPdf(props) {
   const [footImg, setFootImg] = useState('');
   const htmlContent = useRef(null);
   const pageHeight = 40;
+  const imagePageDomId = 'imagePageDomId' + new Date().getTime(); // 生成dom的Id
 
   // 获取 Head, Foot, Content 高度
   useEffect(() => {
@@ -69,14 +70,14 @@ function HtmlToPdf(props) {
           height: domInfo.headRef.offsetHeight, // 下面解决当页面滚动之后生成图片出现白边问题
           width: domInfo.headRef.offsetWidth
         }).then(canvas => {
-          var contentWidth = canvas.width;
-          var contentHeight = canvas.height;
+          const contentWidth = canvas.width;
+          const contentHeight = canvas.height;
 
           //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
-          var imgWidth = width;
-          var imgHeight = (width / contentWidth) * contentHeight;
+          const imgWidth = width;
+          const imgHeight = (width / contentWidth) * contentHeight;
 
-          var pageData = canvas.toDataURL('image/jpeg', 1.0);
+          const pageData = canvas.toDataURL('image/jpeg', 1.0);
           setHeadImg({ data: pageData, width: imgWidth, height: imgHeight });
         });
 
@@ -85,14 +86,14 @@ function HtmlToPdf(props) {
           height: domInfo.footRef.offsetHeight, // 下面解决当页面滚动之后生成图片出现白边问题
           width: domInfo.footRef.offsetWidth
         }).then(canvas => {
-          var contentWidth = canvas.width;
-          var contentHeight = canvas.height;
+          const contentWidth = canvas.width;
+          const contentHeight = canvas.height;
 
           //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
-          var imgWidth = width;
-          var imgHeight = (width / contentWidth) * contentHeight;
+          const imgWidth = width;
+          const imgHeight = (width / contentWidth) * contentHeight;
 
-          var pageData = canvas.toDataURL('image/jpeg', 1.0);
+          const pageData = canvas.toDataURL('image/jpeg', 1.0);
           setFootImg({ data: pageData, width: imgWidth, height: imgHeight });
         });
       }, 100);
@@ -104,10 +105,10 @@ function HtmlToPdf(props) {
   // 监听contentList
   useEffect(() => {
     if (contentList.length > 0 && headImg && footImg) {
-      renderFinish();
+      _.isFunction(renderFinish) && renderFinish();
       getPDF();
     }
-  }, [contentList, headImg, footImg, renderFinish, getPDF]);
+  }, [contentList, headImg, footImg]);
 
   return (
     <div ref={htmlContent} style={{ width: width + 'px' }}>
@@ -136,109 +137,176 @@ function HtmlToPdf(props) {
     </div>
   );
 
+  // 处理html 按要求拼接
   function getPDF() {
-    html2canvas(domInfo.contentRef, {
-      scale: 2,
-      height: domInfo.contentRef.offsetHeight, // 下面解决当页面滚动之后生成图片出现白边问题
-      width: domInfo.contentRef.offsetWidth
-    }).then(canvas => {
-      var contentWidth = canvas.width;
-      var contentHeight = canvas.height;
-      const headerWithFootHeight = headHeight + footHeight + pageHeight; //头部+尾部+页码高度
+    return new Promise((resolve, reject) => {
+      html2canvas(domInfo.contentRef, {
+        scale: 2,
+        height: domInfo.contentRef.offsetHeight, // 下面解决当页面滚动之后生成图片出现白边问题
+        width: domInfo.contentRef.offsetWidth
+      })
+        .then(canvas => {
+          const headerWithFootHeight = headHeight + footHeight + pageHeight; //头部+尾部+页码高度
+          const pageData = canvas.toDataURL('image/jpeg', 1.0);
+          const imagePagesDom = document.createElement('div');
+          imagePagesDom.style.width = width + 'px';
+          imagePagesDom.style.position = 'fixed';
+          imagePagesDom.id = imagePageDomId;
 
-      //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
-      var imgWidth = width;
-      var imgHeight = (width / contentWidth) * contentHeight;
-      var pageData = canvas.toDataURL('image/jpeg', 1.0);
-      var pdf = new jsPDF('', 'pt');
+          contentList.forEach((content, contentIndex) => {
+            const imagBox = document.createElement('div');
+            imagBox.style.width = width + 'px';
+            imagBox.style.height = height + 'px';
+            imagBox.style.paddingLeft = padding + 'px';
+            imagBox.style.paddingRight = padding + 'px';
+            imagBox.style.backgroundColor = '#fff';
+            imagBox.style.marginBottom = '10px';
+            imagBox.innerHTML = '';
+            const imgHead = new Image();
+            const imgContent = new Image();
+            const imgFoot = new Image();
 
-      contentList.forEach((content, contentIndex) => {
-        const imagBox = document.createElement('div');
-        imagBox.style.width = width + 'px';
-        imagBox.style.height = height + 'px';
-        imagBox.style.paddingLeft = padding + 'px';
-        imagBox.style.paddingRight = padding + 'px';
-        imagBox.style.backgroundColor = '#fff';
-        imagBox.innerHTML = '';
-        const imgHead = new Image();
-        const imgContent = new Image();
-        const imgFoot = new Image();
+            // 头部图片渲染完成
+            imgHead.onload = function() {
+              imagBox.appendChild(imgHead);
 
-        // 头部图片渲染完成
-        imgHead.onload = function() {
-          imagBox.appendChild(imgHead);
+              // 中间主题图片渲染完成
+              imgContent.onload = function() {
+                const contentBox = document.createElement('div');
+                contentBox.style.width = '100%';
 
-          // 中间主题图片渲染完成
-          imgContent.onload = function() {
-            const contentBox = document.createElement('div');
-            contentBox.style.width = '100%';
+                contentBox.style.height = height - headerWithFootHeight + 'px';
+                const contentBoxChild = document.createElement('div');
+                contentBoxChild.style.width = '100%';
+                contentBoxChild.style.position = 'relative';
 
-            contentBox.style.height = height - headerWithFootHeight + 'px';
-            const contentBoxChild = document.createElement('div');
-            contentBoxChild.style.width = '100%';
-            contentBoxChild.style.position = 'relative';
+                const diffNum =
+                  content +
+                  (height - headerWithFootHeight) -
+                  contentList[contentIndex + 1];
+                if (diffNum > 0) {
+                  contentBox.style.paddingBottom = diffNum + 'px';
+                }
+                contentBoxChild.style.height = '100%';
+                contentBoxChild.style.overflow = 'hidden';
+                contentBoxChild.appendChild(imgContent);
+                contentBox.style.overflow = 'hidden';
+                contentBox.appendChild(contentBoxChild);
+                imgContent.style.position = 'absolute';
+                imgContent.style.left = 0;
+                imgContent.style.top = -content + 'px';
+                imagBox.appendChild(contentBox);
 
-            const diffNum =
-              content +
-              (height - headerWithFootHeight) -
-              contentList[contentIndex + 1];
-            if (diffNum > 0) {
-              contentBox.style.paddingBottom = diffNum + 'px';
-            }
-            contentBoxChild.style.height = '100%';
-            contentBoxChild.style.overflow = 'hidden';
-            contentBoxChild.appendChild(imgContent);
-            contentBox.style.overflow = 'hidden';
-            contentBox.appendChild(contentBoxChild);
-            imgContent.style.position = 'absolute';
-            imgContent.style.left = 0;
-            imgContent.style.top = -content + 'px';
-            imagBox.appendChild(contentBox);
+                // 底部图片渲染完成
+                imgFoot.onload = function() {
+                  imagBox.appendChild(imgFoot);
 
-            // 底部图片渲染完成
-            imgFoot.onload = function() {
-              imagBox.appendChild(imgFoot);
+                  const pageBox = document.createElement('div');
+                  const pageTextDom = document.createElement('span');
+                  const curPageDom = document.createElement('span');
+                  const splitLineDom = document.createElement('span');
+                  const totalPageDom = document.createElement('span');
+                  pageTextDom.innerText = 'Page ';
+                  curPageDom.innerText = contentIndex + 1;
+                  splitLineDom.innerText = '/';
+                  totalPageDom.innerText = contentList.length;
 
-              const pageBox = document.createElement('div');
-              const pageTextDom = document.createElement('span');
-              const curPageDom = document.createElement('span');
-              const splitLineDom = document.createElement('span');
-              const totalPageDom = document.createElement('span');
-              pageTextDom.innerText = 'Page ';
-              curPageDom.innerText = contentIndex + 1;
-              splitLineDom.innerText = '/';
-              totalPageDom.innerText = contentList.length;
+                  pageBox.style.height = pageHeight + 'px';
+                  pageBox.style.lineHeight = pageHeight + 'px';
+                  pageBox.style.textAlign = 'center';
+                  pageBox.style.fontWeight = '700';
 
-              pageBox.style.height = pageHeight + 'px';
-              pageBox.style.lineHeight = pageHeight + 'px';
-              pageBox.style.textAlign = 'center';
-              pageBox.style.fontWeight = '700';
+                  pageBox.appendChild(pageTextDom);
+                  pageBox.appendChild(curPageDom);
+                  pageBox.appendChild(splitLineDom);
+                  pageBox.appendChild(totalPageDom);
 
-              pageBox.appendChild(pageTextDom);
-              pageBox.appendChild(curPageDom);
-              pageBox.appendChild(splitLineDom);
-              pageBox.appendChild(totalPageDom);
-
-              imagBox.appendChild(pageBox);
-              // 添加底部page/total
-              document.body.appendChild(imagBox);
+                  imagBox.appendChild(pageBox);
+                  // 添加底部page/total
+                  imagePagesDom.appendChild(imagBox);
+                };
+              };
             };
-          };
-        };
 
-        imgHead.src = headImg.data;
-        imgHead.style.width = '100%';
-        imgContent.src = pageData;
-        imgContent.style.width = '100%';
-        imgFoot.src = footImg.data;
-        imgFoot.style.width = '100%';
+            imgHead.src = headImg.data;
+            imgHead.style.width = '100%';
+            imgContent.src = pageData;
+            imgContent.style.width = '100%';
+            imgFoot.src = footImg.data;
+            imgFoot.style.width = '100%';
+          });
 
-        // pdf.addImage(headImg.data, 'JPEG', 0, 0, headImg.width, headImg.height);
-        // pdf.addImage(pageData, 'JPEG', 0, -content, imgWidth, imgHeight);
-        // pdf.addImage(footImg.data, 'JPEG', 0, 0, footImg.width, footImg.height);
-      });
+          document.body.appendChild(imagePagesDom);
 
-      // pdf.save('content.pdf');
+          setTimeout(() => {
+            _.isFunction(finish) && finish();
+          }, 100);
+
+          // 如果没有预览, 那么就直接生成pdf并返回
+          if (preview) {
+            setGetPdfCallback(() => {
+              return () => createPDF();
+            });
+
+            resolve(true);
+
+            return;
+          }
+
+          createPDF().then(fileString => {
+            resolve(fileString);
+          });
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  // 生成pdf文件
+  function createPDF() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const imagePageDom = document.getElementById(imagePageDomId);
+        const ImagePageDomChildren = imagePageDom.children;
+        const html2canvasList = [];
+        const pdf = new jsPDF('', 'pt');
+
+        [...ImagePageDomChildren].forEach(ImagePageDomChild => {
+          html2canvasList.push(
+            html2canvas(ImagePageDomChild, {
+              scale: 2,
+              width: ImagePageDomChild.offsetWidth,
+              height: ImagePageDomChild.offsetHeight
+            })
+          );
+        });
+
+        Promise.all(html2canvasList)
+          .then(imgList => {
+            imgList.forEach((canvas, canvasIndex) => {
+              const contentWidth = canvas.width;
+              const contentHeight = canvas.height;
+              //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
+              const imgWidth = width;
+              const imgHeight = (width / contentWidth) * contentHeight;
+              const pageData = canvas.toDataURL('image/jpeg', 1.0);
+
+              pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
+
+              if (canvasIndex < imgList.length - 1) {
+                pdf.addPage();
+              }
+            });
+
+            const fileString = pdf.output('dataurlstring').substring(28);
+
+            resolve(fileString);
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }, 100);
     });
   }
 }

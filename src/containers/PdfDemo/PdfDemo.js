@@ -883,9 +883,10 @@ function PdfDemo() {
 
   return (
     <div>
-      {/* <button onClick={() => getPdfCallback()}>生成pdf</button> */}
+      <button onClick={createPDF}>生成pdf</button>
       <HtmlToPdf
         preview
+        fileName="测试Pdf文件名"
         padding={20}
         Head={Header}
         Foot={Footer}
@@ -903,6 +904,12 @@ function PdfDemo() {
 
   function finish() {
     console.log('finish');
+  }
+
+  function createPDF() {
+    getPdfCallback().then(fileString => {
+      console.log(fileString);
+    });
   }
 }
 

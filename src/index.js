@@ -10,7 +10,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import InitRoute from 'components/InitRoute/InitRoute';
 import Create from 'components/Create';
 import FormDemo from 'components/Form/Form';
-import FormDemo22 from 'components/Form/FormDemo';
+import FormRepeatDemo from './containers/FormRepeatDemo/FormRepeatDemo';
 import Lang from 'components/Lang/Lang';
 import TableCell from 'components/TableCell/TableCell';
 import reducer from './redux';
@@ -39,6 +39,9 @@ ReactDOM.render(
           </Route>
           <Route path="/pdf">
             <PdfDemo />
+          </Route>
+          <Route path="/formRepeat">
+            <FormRepeatDemo />
           </Route>
         </Switch>
       </div>

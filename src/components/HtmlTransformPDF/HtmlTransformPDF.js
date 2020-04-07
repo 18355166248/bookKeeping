@@ -4,6 +4,7 @@ import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import PropTypes from 'prop-types';
+import { previewDom } from './previewDom';
 
 // HtmlTransformPDF.proptypes = {
 //   Head: PropTypes.any, // 头部
@@ -13,6 +14,7 @@ import PropTypes from 'prop-types';
 //   width: PropTypes.number, // PDF宽度
 //   padding: PropTypes.number, // PDF左右间距
 //   renderFinish: PropTypes.func, // 虚拟Dom渲染完成回调函数
+//   previewFinish: PropTypes.func, // 预览Dom渲染完成
 //   finish: PropTypes.func, // 生成PDF的每页图片渲染完成
 //   preview: PropTypes.bool, // 是否需要预览
 //   setGetPdfCallback: PropTypes.func, // 预览情况下, 通过这个hook设置获取文件数据回调
@@ -32,6 +34,7 @@ function HtmlTransformPDF(props) {
     width = 595.28,
     padding,
     renderFinish,
+    previewFinish,
     finish,
     preview = false,
     setGetPdfCallback,
@@ -52,6 +55,7 @@ function HtmlTransformPDF(props) {
   // 获取 Head, Foot, Content 高度
   useEffect(() => {
     if (_.isPlainObject(domInfo)) {
+      console.time('previewFinish');
       const { headData, footData, contentData } = domInfo;
       const headRef = document.getElementById(headData.id);
       const contentRef = document.getElementById(contentData.id);
@@ -198,142 +202,68 @@ function HtmlTransformPDF(props) {
         imagePagesDom.style.left = '0';
         imagePagesDom.id = imagePageDomId;
 
-        contentList.forEach((content, contentIndex) => {
-          const imagBox = document.createElement('div');
+        previewDom(contentList, {
+          width,
+          height,
+          headerWithFootHeight,
+          pageHeight,
+          padding,
+          destroy,
+          headImg,
+          pageData,
+          footImg,
+          imagePagesDom,
+        })
+        .then(() => {
+          // 放在body上进行合成图片渲染
+          document.body.appendChild(imagePagesDom);
+          // 放在container上进行预览
+          const cloneImagePagesDom = imagePagesDom.cloneNode(true);
 
-          imagBox.style.width = width + 'px';
-          imagBox.style.height = height + 'px';
-          imagBox.style.paddingLeft = padding + 'px';
-          imagBox.style.paddingRight = padding + 'px';
-          imagBox.style.backgroundColor = '#fff';
-          // imagBox.style.marginBottom = '10px';
-          imagBox.innerHTML = '';
-          const imgHead = new Image();
-          const imgContent = new Image();
-          const imgFoot = new Image();
+          cloneImagePagesDom.style.position = 'static';
+          cloneImagePagesDom.style.zIndex = 0;
+          container.current && container.current.appendChild(cloneImagePagesDom);
 
-          // 头部图片渲染完成
-          imgHead.onload = function () {
+          _.isFunction(previewFinish) && previewFinish();
+          console.timeEnd('previewFinish');
+
+          console.time('finish');
+
+          createPDFPreview()
+          .then(({ imgList }) => {
             if (destroy()) {
               return;
             }
 
-            imagBox.appendChild(imgHead);
+            console.timeEnd('finish');
 
-            // 中间主题图片渲染完成
-            imgContent.onload = function () {
-              if (destroy()) {
-                return;
-              }
+            // 如果有预览, 那么就设置setGetPdfCallback
+            if (preview) {
+              setGetPdfCallback(() => {
+                return () => createPDF(imgList);
+              });
+              _.isFunction(finish) && finish();
 
-              const contentBox = document.createElement('div');
+              return;
+            }
 
-              contentBox.style.width = '100%';
-              contentBox.style.height = height - headerWithFootHeight + 'px';
+            // 如果没有预览, 就直接返回pdf文件数据
+            _.isFunction(finish) && finish(createPDF(imgList));
+          })
+          .finally(() => {
+            transformStopStatus = false;
 
-              const contentBoxChild = document.createElement('div');
+            if (imagePagesDom.parentNode) {
+              imagePagesDom.parentNode.removeChild(imagePagesDom);
+            }
+          })
+          .catch(err => {
+            console.log(err);
 
-              contentBoxChild.style.width = '100%';
-              contentBoxChild.style.position = 'relative';
-
-              const diffNum =
-                content +
-                (height - headerWithFootHeight) -
-                contentList[contentIndex + 1];
-
-              if (diffNum > 0) {
-                contentBox.style.paddingBottom = diffNum + 'px';
-              }
-
-              contentBoxChild.style.height = '100%';
-              contentBoxChild.style.overflow = 'hidden';
-              contentBoxChild.appendChild(imgContent);
-              contentBox.style.overflow = 'hidden';
-              contentBox.appendChild(contentBoxChild);
-              imgContent.style.position = 'absolute';
-              imgContent.style.left = 0;
-              imgContent.style.top = -content + 'px';
-              imagBox.appendChild(contentBox);
-
-              // 底部图片渲染完成
-              imgFoot.onload = function () {
-                if (destroy()) {
-                  return;
-                }
-
-                imagBox.appendChild(imgFoot);
-
-                const pageBox = document.createElement('div');
-                const pageTextDom = document.createElement('span');
-                const curPageDom = document.createElement('span');
-                const splitLineDom = document.createElement('span');
-                const totalPageDom = document.createElement('span');
-
-                pageTextDom.innerText = 'Page ';
-                curPageDom.innerText = contentIndex + 1;
-                splitLineDom.innerText = '/';
-                totalPageDom.innerText = contentList.length;
-
-                pageBox.style.height = pageHeight + 'px';
-                pageBox.style.lineHeight = pageHeight + 'px';
-                pageBox.style.textAlign = 'center';
-                pageBox.style.fontWeight = '700';
-
-                pageBox.appendChild(pageTextDom);
-                pageBox.appendChild(curPageDom);
-                pageBox.appendChild(splitLineDom);
-                pageBox.appendChild(totalPageDom);
-
-                imagBox.appendChild(pageBox);
-                // 添加底部page/total
-                imagePagesDom.appendChild(imagBox);
-              };
-            };
-          };
-
-          imgHead.src = headImg.data;
-          imgHead.style.width = '100%';
-          imgContent.src = pageData;
-          imgContent.style.width = '100%';
-          imgFoot.src = footImg.data;
-          imgFoot.style.width = '100%';
-        });
-
-        document.body.appendChild(imagePagesDom);
-
-        createPDFPreview()
-        .then(({ imgDomList, imgList }) => {
-          if (destroy()) {
-            return;
-          }
-
-          container.current ? container.current.appendChild(imgDomList) : document.body.appendChild(imgDomList);
-
-          // 如果有预览, 那么就设置setGetPdfCallback
-          if (preview) {
-            setGetPdfCallback(() => {
-              return () => createPDF(imgList);
-            });
-            _.isFunction(finish) && finish();
-
-            return;
-          }
-
-          // 如果没有预览, 就直接返回pdf文件数据
-          _.isFunction(finish) && finish(createPDF(imgList));
+            return Promise.reject(err);
+          });
         })
-        .finally(() => {
-          transformStopStatus = false;
-
-          if (imagePagesDom.parentNode) {
-            imagePagesDom.parentNode.removeChild(imagePagesDom);
-          }
-        })
-        .catch(err => {
-          console.log(err);
-
-          return Promise.reject(err);
-        });
+        .catch();
       })
       .catch(err => {
         console.log(err);
@@ -389,7 +319,7 @@ function HtmlTransformPDF(props) {
 
               if (num === imgList.length) {
                 // 加载完成
-                resolve({ imgDomList, imgList });
+                resolve({ imgList });
               }
             };
             previewImage.src = pageData;

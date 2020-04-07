@@ -9,8 +9,9 @@ const unit = new UnitConversion();
 
 // a4纸的尺寸[595.28,841.89]
 function PdfDemo() {
+  const [getData, setData] = useState(null);
   const [getPdfCallback, setGetPdfCallback] = useState(() => {});
-  const [spinning, setSpinning] = useState(true);
+  const [spinning, setSpinning] = useState(false);
 
   const modalWidth = unit.mmConversionPx(210);
 
@@ -915,7 +916,16 @@ function PdfDemo() {
 
   return (
     <div>
-      {/* <button onClick={createPDF}>生成pdf</button> */}
+      <button
+        onClick={() => {
+          // setSpinning(true);
+          // setData(data);
+
+          windowOpen();
+        }}
+      >
+        生成pdf
+      </button>
       <button onClick={submit}>保存</button>
       <Spin
         spinning={spinning}
@@ -927,20 +937,23 @@ function PdfDemo() {
         ref={container}
         style={{ display: 'flex', justifyContent: 'center' }}
       >
-        <HtmlTransformPDF
-          preview
-          width={modalWidth}
-          height={Math.ceil(unit.mmConversionPx(296))}
-          virtualClass="transformPDF"
-          container={container}
-          padding={20}
-          Head={Header}
-          Foot={Footer}
-          Content={Content}
-          renderFinish={renderFinish}
-          finish={finish}
-          setGetPdfCallback={setGetPdfCallback}
-        />
+        {getData && (
+          <HtmlTransformPDF
+            preview
+            width={modalWidth}
+            height={Math.ceil(unit.mmConversionPx(296))}
+            virtualClass="transformPDF"
+            container={container}
+            padding={20}
+            Head={Header}
+            Foot={Footer}
+            Content={Content}
+            renderFinish={renderFinish}
+            finish={finish}
+            previewFinish={previewFinish}
+            setGetPdfCallback={setGetPdfCallback}
+          />
+        )}
       </div>
     </div>
   );
@@ -949,15 +962,40 @@ function PdfDemo() {
     console.log('renderFinish');
   }
 
+  // 预览dom出现, 隐藏Spin
+  function previewFinish() {
+    setSpinning(false);
+    console.log('previewFinish');
+  }
+
   function finish() {
     console.log('finish');
-    setSpinning(false);
   }
 
   function submit() {
     const file = getPdfCallback();
 
     console.log(file);
+  }
+
+  function windowOpen() {
+    const pdfWidth = 300;
+    const pdfHeight = 300;
+    const left = document.body.clientWidth / 2 - pdfWidth;
+    console.log(left);
+    const pdfWindow = window.open(
+      '',
+      '_blank',
+      'height=' +
+        pdfHeight +
+        ',width=' +
+        pdfWidth +
+        ',top=200,left=' +
+        left +
+        ',toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,titlebar=no,directories=no,'
+    );
+
+    console.log(pdfWindow);
   }
 }
 
@@ -966,7 +1004,7 @@ function UnitConversion() {
    * 获取DPI
    * @returns {Array}
    */
-  this.conversion_getDPI = function () {
+  this.conversion_getDPI = function() {
     const arrDPI = [];
 
     if (window.screen.deviceXDPI) {
@@ -975,7 +1013,8 @@ function UnitConversion() {
     } else {
       const tmpNode = document.createElement('div');
 
-      tmpNode.style.cssText = 'width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden';
+      tmpNode.style.cssText =
+        'width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden';
       document.body.appendChild(tmpNode);
       arrDPI[0] = parseInt(tmpNode.offsetWidth);
       arrDPI[1] = parseInt(tmpNode.offsetHeight);
@@ -989,7 +1028,7 @@ function UnitConversion() {
    * @param value
    * @returns {number}
    */
-  this.pxConversionMm = function (value) {
+  this.pxConversionMm = function(value) {
     const inch = value / this.conversion_getDPI()[0];
 
     return inch * 25.4;
@@ -999,7 +1038,7 @@ function UnitConversion() {
    * @param value
    * @returns {number}
    */
-  this.mmConversionPx = function (value) {
+  this.mmConversionPx = function(value) {
     const inch = value / 25.4;
 
     return inch * this.conversion_getDPI()[0];

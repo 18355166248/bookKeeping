@@ -918,10 +918,10 @@ function PdfDemo() {
     <div>
       <button
         onClick={() => {
-          // setSpinning(true);
-          // setData(data);
+          setSpinning(true);
+          setData(data);
 
-          windowOpen();
+          // windowOpen();
         }}
       >
         生成pdf

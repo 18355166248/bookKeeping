@@ -31,9 +31,7 @@ function VirtualDom(props) {
         width: width + 'px',
         padding: padding + 'px',
         position: 'fixed',
-        left: '9999px',
-        top: '9999px',
-        zIndex: 1,
+        zIndex: -10,
         opacity: '0',
       }}
     >

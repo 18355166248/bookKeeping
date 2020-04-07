@@ -12,6 +12,7 @@ export function previewDom(contentList, {
 }) {
   return new Promise(resolve => {
     let loadNum = 0; // 每页三个 contentList * 3 = 总loadNum
+    const fragment = document.createDocumentFragment();
 
     contentList.forEach((content, contentIndex) => {
       const imagBox = document.createElement('div');
@@ -106,7 +107,7 @@ export function previewDom(contentList, {
       imagBox.appendChild(contentBox);
       imagBox.appendChild(imgFoot);
 
-      imagePagesDom.appendChild(imagBox);
+      fragment.appendChild(imagBox);
 
       imgHead.src = headImg.data;
       imgHead.style.width = '100%';
@@ -119,6 +120,7 @@ export function previewDom(contentList, {
     function resolveEnd() {
       if (typeof loadNum === 'number' && ++loadNum === contentList.length * 3) {
         loadNum = '';
+        imagePagesDom.appendChild(fragment);
         resolve();
       }
     }

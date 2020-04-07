@@ -5,6 +5,7 @@ import HeaderPrice from "components/HeaderPrice/HeaderPrice";
 import { repairZero } from "utils/util";
 import { changeDate } from "@/redux/list";
 import "./App.scss";
+import PdfDemo from './containers/PdfDemo/PdfDemo';
 
 export const MyContext = React.createContext();
 
@@ -57,6 +58,7 @@ class App extends Component {
             <ViewTab list={list}></ViewTab>
           </div>
         </div>
+        <PdfDemo />
       </MyContext.Provider>
     );
   }
